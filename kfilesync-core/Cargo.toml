@@ -1,0 +1,51 @@
+[package]
+name = "kfilesync-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Sans-IO core for KFileSync (shared by desktop and mobile)."
+keywords = ["sync", "file-sync", "lan", "p2p", "sans-io"]
+categories = ["network-programming"]
+
+[lib]
+name = "kfilesync_core"
+# rlib     -> desktop Tauri / unit tests
+# staticlib -> iOS .a (consumed by XCFramework)
+# cdylib    -> Android .so (consumed by cargo-ndk)
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+[features]
+# Default build = pure Rust lib (no UniFFI scaffolding).
+# Enable `ffi` to generate the UniFFI bindings entry point.
+default = ["std"]
+std = ["serde/std", "serde_json/std"]
+ffi = ["dep:uniffi"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+serde-json-core.workspace = true
+blake3 = { workspace = true, features = ["pure"] }
+sha2.workspace = true
+subtle.workspace = true
+zeroize.workspace = true
+hashbrown.workspace = true
+ignore.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+uniffi = { workspace = true, optional = true }
+
+[build-dependencies]
+# Always pulled in (small, build-only), Actual scaffolding generation is
+# gated behind `#[cfg(feature = "ffi")]` inside build.rs.
+uniffi = { workspace = true, features = ["build"] }
+
+[dev-dependencies]
+proptest.workspace = true
+
+[[bench]]
+name = "hot_paths"
+harness = false

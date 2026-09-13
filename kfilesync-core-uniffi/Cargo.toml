@@ -1,0 +1,16 @@
+[package]
+name = "kfilesync-core-uniffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "uniffi-bindgen CLI entry point for kfilesync-core."
+publish = false
+
+[[bin]]
+name = "kfilesync-core-uniffi"
+path = "src/main.rs"
+
+[dependencies]
+uniffi = { workspace = true, features = ["cli"] }

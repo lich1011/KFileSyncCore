@@ -1,0 +1,20 @@
+[package]
+name = "kfilesync-conformance-runner"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Runs the shared JSON fixtures against the Rust core."
+publish = false
+
+[[bin]]
+name = "kfilesync-conformance-runner"
+path = "src/main.rs"
+
+[dependencies]
+kfilesync-core = { path = "../../kfilesync-core" }
+serde = { workspace = true, features = ["std"] }
+serde_json = { workspace = true, features = ["std"] }
+anyhow = "1"
+walkdir = "2"

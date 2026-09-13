@@ -1,0 +1,357 @@
+{
+    "name": "sync plan generation, with explicit tombstone-propagation regression coverage",
+    "description": "Each case gives a local and remote FileEntry index (path + version_vector map + deleted flag only \u2014 the fields sync_plan_generator actually reads) and the expected path lists in each SyncPlan bucket. Cases 3 and 4 are the exact regression CROSS_VALIDATION_DESKTOP_MOBILE.md \u00a73.3 flagged: the desktop's old code filtered `!deleted` in these two branches, silently dropping deletions instead of propagating them. See ADR-009.",
+    "cases": [
+        {
+            "name": "local-only entry is pushed",
+            "local": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "remote": [],
+            "expected_to_push": [
+                "a.txt"
+            ],
+            "expected_to_pull": [],
+            "expected_conflicts": [],
+            "expected_unchanged": []
+        },
+        {
+            "name": "remote-only entry is pulled",
+            "local": [],
+            "remote": [
+                {
+                    "path": "b.txt",
+                    "version_vector": {
+                        "dev-b": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "expected_to_push": [],
+            "expected_to_pull": [
+                "b.txt"
+            ],
+            "expected_conflicts": [],
+            "expected_unchanged": []
+        },
+        {
+            "name": "REGRESSION: local-only tombstone must still be pushed, not filtered",
+            "local": [
+                {
+                    "path": "gone.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": true
+                }
+            ],
+            "remote": [],
+            "expected_to_push": [
+                "gone.txt"
+            ],
+            "expected_to_pull": [],
+            "expected_conflicts": [],
+            "expected_unchanged": []
+        },
+        {
+            "name": "REGRESSION: remote-only tombstone must still be pulled, not filtered",
+            "local": [],
+            "remote": [
+                {
+                    "path": "gone.txt",
+                    "version_vector": {
+                        "dev-b": 1
+                    },
+                    "deleted": true
+                }
+            ],
+            "expected_to_push": [],
+            "expected_to_pull": [
+                "gone.txt"
+            ],
+            "expected_conflicts": [],
+            "expected_unchanged": []
+        },
+        {
+            "name": "equal version vectors are unchanged",
+            "local": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 2,
+                        "dev-b": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "remote": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 2,
+                        "dev-b": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "expected_to_push": [],
+            "expected_to_pull": [],
+            "expected_conflicts": [],
+            "expected_unchanged": [
+                "a.txt"
+            ]
+        },
+        {
+            "name": "both sides carry the identical tombstone: still unchanged, not re-pushed forever",
+            "local": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": true
+                }
+            ],
+            "remote": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": true
+                }
+            ],
+            "expected_to_push": [],
+            "expected_to_pull": [],
+            "expected_conflicts": [],
+            "expected_unchanged": [
+                "a.txt"
+            ]
+        },
+        {
+            "name": "local is a causal ancestor of remote: pull (remote is newer)",
+            "local": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "remote": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 2
+                    },
+                    "deleted": false
+                }
+            ],
+            "expected_to_push": [],
+            "expected_to_pull": [
+                "a.txt"
+            ],
+            "expected_conflicts": [],
+            "expected_unchanged": []
+        },
+        {
+            "name": "remote is a causal ancestor of local: push (local is newer)",
+            "local": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 2
+                    },
+                    "deleted": false
+                }
+            ],
+            "remote": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "expected_to_push": [
+                "a.txt"
+            ],
+            "expected_to_pull": [],
+            "expected_conflicts": [],
+            "expected_unchanged": []
+        },
+        {
+            "name": "concurrent edits from different devices are a conflict",
+            "local": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "remote": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-b": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "expected_to_push": [],
+            "expected_to_pull": [],
+            "expected_conflicts": [
+                "a.txt"
+            ],
+            "expected_unchanged": []
+        },
+        {
+            "name": "tombstone plus concurrent modification is a conflict, not silently resolved",
+            "local": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": true
+                }
+            ],
+            "remote": [
+                {
+                    "path": "a.txt",
+                    "version_vector": {
+                        "dev-b": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "expected_to_push": [],
+            "expected_to_pull": [],
+            "expected_conflicts": [
+                "a.txt"
+            ],
+            "expected_unchanged": []
+        },
+        {
+            "name": "mixed index: each path is classified independently of the others",
+            "local": [
+                {
+                    "path": "only_local.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "newer_local.txt",
+                    "version_vector": {
+                        "dev-a": 2
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "same.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "conflict.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "remote": [
+                {
+                    "path": "only_remote.txt",
+                    "version_vector": {
+                        "dev-b": 1
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "newer_local.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "same.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "conflict.txt",
+                    "version_vector": {
+                        "dev-b": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "expected_to_push": [
+                "newer_local.txt",
+                "only_local.txt"
+            ],
+            "expected_to_pull": [
+                "only_remote.txt"
+            ],
+            "expected_conflicts": [
+                "conflict.txt"
+            ],
+            "expected_unchanged": [
+                "same.txt"
+            ]
+        },
+        {
+            "name": "results within each bucket are sorted by path",
+            "local": [
+                {
+                    "path": "zebra.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "apple.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                },
+                {
+                    "path": "mango.txt",
+                    "version_vector": {
+                        "dev-a": 1
+                    },
+                    "deleted": false
+                }
+            ],
+            "remote": [],
+            "expected_to_push": [
+                "apple.txt",
+                "mango.txt",
+                "zebra.txt"
+            ],
+            "expected_to_pull": [],
+            "expected_conflicts": [],
+            "expected_unchanged": []
+        }
+    ]
+}

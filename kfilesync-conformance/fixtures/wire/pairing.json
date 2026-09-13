@@ -1,0 +1,66 @@
+{
+    "name": "wire round-trip: pairing",
+    "description": "See wire/discovery.json for the fixture format. Covers PairRequestDto, PairConfirmDto, PairRevokeDto, PairResultDto.",
+    "cases": [
+        {
+            "name": "PairRequestDto: typical initiation",
+            "dto": "PairRequestDto",
+            "json": {
+                "request_id": "req-abc123",
+                "from_device_id": "dev-a",
+                "from_alias": "Alice's Laptop",
+                "from_platform": "macos",
+                "from_fingerprint": "deadbeefcafef00d0011223344556677",
+                "nonce": "n-9f8e7d6c",
+                "expires_at_ms": 1781019000000
+            }
+        },
+        {
+            "name": "PairConfirmDto: PIN + certificate exchange",
+            "dto": "PairConfirmDto",
+            "json": {
+                "request_id": "req-abc123",
+                "pin": "482913",
+                "certificate_pem": "-----BEGIN CERTIFICATE-----\nMIIB...\n-----END CERTIFICATE-----"
+            }
+        },
+        {
+            "name": "PairRevokeDto: with a reason",
+            "dto": "PairRevokeDto",
+            "json": {
+                "device_id": "dev-a",
+                "reason": "lost device",
+                "revoked_at_ms": 1781019000000
+            }
+        },
+        {
+            "name": "PairRevokeDto: no reason given",
+            "dto": "PairRevokeDto",
+            "json": {
+                "device_id": "dev-a",
+                "reason": null,
+                "revoked_at_ms": 1781019000000
+            }
+        },
+        {
+            "name": "PairResultDto: accepted",
+            "dto": "PairResultDto",
+            "json": {
+                "request_id": "req-abc123",
+                "accepted": true,
+                "peer_certificate_pem": "-----BEGIN CERTIFICATE-----\nMIIC...\n-----END CERTIFICATE-----",
+                "reason": null
+            }
+        },
+        {
+            "name": "PairResultDto: rejected",
+            "dto": "PairResultDto",
+            "json": {
+                "request_id": "req-abc123",
+                "accepted": false,
+                "peer_certificate_pem": null,
+                "reason": "pin mismatch"
+            }
+        }
+    ]
+}

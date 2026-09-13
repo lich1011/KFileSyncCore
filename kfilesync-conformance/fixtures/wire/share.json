@@ -1,0 +1,57 @@
+{
+    "name": "wire round-trip: shares",
+    "description": "See wire/discovery.json for the fixture format. Covers ShareInviteDto, ShareAuthorizeDto, ShareLeaveDto.",
+    "cases": [
+        {
+            "name": "ShareInviteDto: two-way read-write invite",
+            "dto": "ShareInviteDto",
+            "json": {
+                "share_id": "share-1",
+                "share_name": "Family Photos",
+                "from_device_id": "dev-a",
+                "default_permission": "read_write",
+                "sync_mode": "two_way",
+                "invited_at_ms": 1781019000000
+            }
+        },
+        {
+            "name": "ShareInviteDto: send-only read-only invite",
+            "dto": "ShareInviteDto",
+            "json": {
+                "share_id": "share-2",
+                "share_name": "Backup Archive",
+                "from_device_id": "dev-b",
+                "default_permission": "read_only",
+                "sync_mode": "send_only",
+                "invited_at_ms": 1781019100000
+            }
+        },
+        {
+            "name": "ShareAuthorizeDto: accepted",
+            "dto": "ShareAuthorizeDto",
+            "json": {
+                "share_id": "share-1",
+                "accepted": true,
+                "reason": null
+            }
+        },
+        {
+            "name": "ShareAuthorizeDto: declined with reason",
+            "dto": "ShareAuthorizeDto",
+            "json": {
+                "share_id": "share-1",
+                "accepted": false,
+                "reason": "not interested"
+            }
+        },
+        {
+            "name": "ShareLeaveDto",
+            "dto": "ShareLeaveDto",
+            "json": {
+                "share_id": "share-1",
+                "device_id": "dev-a",
+                "left_at_ms": 1781019200000
+            }
+        }
+    ]
+}

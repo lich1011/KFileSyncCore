@@ -1,0 +1,60 @@
+{
+    "name": "version vector merge",
+    "description": "Tests per-key max behavior of merge.",
+    "cases": [
+        {
+            "name": "merge empty with non-empty",
+            "a": {},
+            "b": {
+                "device-a": 1
+            },
+            "expected_merged": {
+                "device-a": 1
+            }
+        },
+        {
+            "name": "merge takes max per key",
+            "a": {
+                "device-a": 3,
+                "device-b": 1
+            },
+            "b": {
+                "device-a": 1,
+                "device-c": 7
+            },
+            "expected_merged": {
+                "device-a": 3,
+                "device-b": 1,
+                "device-c": 7
+            }
+        },
+        {
+            "name": "merge resolves concurrent edits",
+            "a": {
+                "device-a": 1
+            },
+            "b": {
+                "device-b": 1
+            },
+            "expected_merged": {
+                "device-a": 1,
+                "device-b": 1
+            }
+        },
+        {
+            "name": "merge is idempotent",
+            "a": {
+                "device-a": 5,
+                "device-b": 3
+            },
+            "b": {
+                "device-a": 5,
+                "device-b": 3
+            },
+            "expected_merged": {
+                "device-a": 5,
+                "device-b": 3
+            }
+        }
+    ]
+}

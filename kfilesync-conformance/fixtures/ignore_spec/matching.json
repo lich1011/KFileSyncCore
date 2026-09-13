@@ -1,0 +1,348 @@
+{
+    "name": "ignore spec matching",
+    "description": "Each case builds one IgnoreSpec and runs a list of path checks against it. is_mobile toggles whether MOBILE_DEFAULTS is included on top of COMMON_DEFAULTS.",
+    "cases": [
+        {
+            "name": "common defaults are always applied regardless of is_mobile",
+            "is_mobile": false,
+            "extra_user_rules": [],
+            "checks": [
+                {
+                    "path": ".DS_Store",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "nested/dir/.DS_Store",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "Thumbs.db",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "desktop.ini",
+                    "is_directory": false,
+                    "expected_ignored": true
+                }
+            ]
+        },
+        {
+            "name": "REGRESSION: .lansync-tmp/ is ignored on desktop (CROSS_VALIDATION §3.6)",
+            "is_mobile": false,
+            "extra_user_rules": [],
+            "checks": [
+                {
+                    "path": ".lansync-tmp",
+                    "is_directory": true,
+                    "expected_ignored": true
+                },
+                {
+                    "path": ".lansync-tmp/partial_download.bin",
+                    "is_directory": false,
+                    "expected_ignored": true
+                }
+            ]
+        },
+        {
+            "name": "REGRESSION: .lansync-tmp/ is ignored on mobile too (this is exactly what mobile's hand-rolled defaults list was missing)",
+            "is_mobile": true,
+            "extra_user_rules": [],
+            "checks": [
+                {
+                    "path": ".lansync-tmp",
+                    "is_directory": true,
+                    "expected_ignored": true
+                },
+                {
+                    "path": ".lansync-tmp/partial_download.bin",
+                    "is_directory": false,
+                    "expected_ignored": true
+                }
+            ]
+        },
+        {
+            "name": "mobile-only defaults do not apply when is_mobile is false",
+            "is_mobile": false,
+            "extra_user_rules": [],
+            "checks": [
+                {
+                    "path": "build",
+                    "is_directory": true,
+                    "expected_ignored": false
+                },
+                {
+                    "path": "node_modules",
+                    "is_directory": true,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "mobile-only defaults apply when is_mobile is true",
+            "is_mobile": true,
+            "extra_user_rules": [],
+            "checks": [
+                {
+                    "path": "build",
+                    "is_directory": true,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "app.apk",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "node_modules",
+                    "is_directory": true,
+                    "expected_ignored": true
+                }
+            ]
+        },
+        {
+            "name": "parent-directory short-circuit: files beneath an ignored directory are ignored even with no rule of their own",
+            "is_mobile": false,
+            "extra_user_rules": [
+                "build/"
+            ],
+            "checks": [
+                {
+                    "path": "build",
+                    "is_directory": true,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "build/output.txt",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "build/nested/deep/file.o",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "src/main.rs",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": ".syncignore content is parsed like a real gitignore file (comments and blank lines are no-ops)",
+            "is_mobile": false,
+            "syncignore_content": "# a comment\n\n*.log\ncache/\n",
+            "extra_user_rules": [],
+            "checks": [
+                {
+                    "path": "debug.log",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "cache/entry.bin",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "keep.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "extra_user_rules apply after .syncignore and can negate it",
+            "is_mobile": false,
+            "syncignore_content": "*.log\n",
+            "extra_user_rules": [
+                "!important.log"
+            ],
+            "checks": [
+                {
+                    "path": "debug.log",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "important.log",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "** matches across any number of directory levels",
+            "is_mobile": false,
+            "extra_user_rules": [
+                "**/*.bak"
+            ],
+            "checks": [
+                {
+                    "path": "file.bak",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "a/file.bak",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "a/b/c/file.bak",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "keep.bak.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "trailing ** matches everything under a directory",
+            "is_mobile": false,
+            "extra_user_rules": [
+                "temp/**"
+            ],
+            "checks": [
+                {
+                    "path": "temp/x/y/z.txt",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "other/x.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "? matches exactly one character",
+            "is_mobile": false,
+            "extra_user_rules": [
+                "file?.txt"
+            ],
+            "checks": [
+                {
+                    "path": "file1.txt",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "file12.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                },
+                {
+                    "path": "file.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "[abc] character class matches any listed character",
+            "is_mobile": false,
+            "extra_user_rules": [
+                "file[0-9].txt"
+            ],
+            "checks": [
+                {
+                    "path": "file1.txt",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "file9.txt",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "filea.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "[!abc] negated character class",
+            "is_mobile": false,
+            "extra_user_rules": [
+                "file[!0-9].txt"
+            ],
+            "checks": [
+                {
+                    "path": "file1.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                },
+                {
+                    "path": "filea.txt",
+                    "is_directory": false,
+                    "expected_ignored": true
+                }
+            ]
+        },
+        {
+            "name": "an accidental leading slash on the checked path does not change the result",
+            "is_mobile": false,
+            "extra_user_rules": [
+                ".DS_Store"
+            ],
+            "checks": [
+                {
+                    "path": ".DS_Store",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "/.DS_Store",
+                    "is_directory": false,
+                    "expected_ignored": true
+                }
+            ]
+        },
+        {
+            "name": "anchored rule (leading /) only matches at the share root, not nested occurrences",
+            "is_mobile": false,
+            "extra_user_rules": [
+                "/only_at_root.txt"
+            ],
+            "checks": [
+                {
+                    "path": "only_at_root.txt",
+                    "is_directory": false,
+                    "expected_ignored": true
+                },
+                {
+                    "path": "sub/only_at_root.txt",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        },
+        {
+            "name": "no rules at all still applies COMMON_DEFAULTS but ignores nothing else",
+            "is_mobile": false,
+            "extra_user_rules": [],
+            "checks": [
+                {
+                    "path": "readme.md",
+                    "is_directory": false,
+                    "expected_ignored": false
+                },
+                {
+                    "path": "src/lib.rs",
+                    "is_directory": false,
+                    "expected_ignored": false
+                }
+            ]
+        }
+    ]
+}

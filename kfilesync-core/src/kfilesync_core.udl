@@ -1,0 +1,18 @@
+// kfilesync_core.udl
+//
+// UniFFI interface definition (UDL approach).
+//
+// This file is consumed by `build.rs` only when the `ffi` Cargo feature is
+// enabled. The proc-macro approach (`#[uniffi::export]`) is used in parallel
+// for new code - see `src/ffi/mod.rs`. Both compile to the same scaffolding;
+// pick whichever style fits the surface area.
+
+namespace kfilesync_core {
+    // Library metadata
+    string core_version();
+    string protocol_version();
+
+    // Chunking - Sprint 1
+    u32 compute_chunk_size(u64 file_size);
+    u32 compute_chunk_count(u64 file_size);
+};

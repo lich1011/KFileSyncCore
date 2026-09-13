@@ -1,0 +1,102 @@
+{
+    "name": "wire round-trip: sync index",
+    "description": "See wire/discovery.json for the fixture format. Covers IndexResponseDto (which nests FileEntryDto and BlockInfoDto). entry_type is always lowercase with no 'symlink' variant (ADR-008); modified_at_ms/deleted_at_ms are milliseconds (ADR-006); blocks is an array of {index, size, hash} objects, not a bare hash-string array (see dto.rs module docs / ADR-014).",
+    "cases": [
+        {
+            "name": "index with one chunked file",
+            "dto": "IndexResponseDto",
+            "json": {
+                "share_id": "share-1",
+                "index_version": 42,
+                "entries": [
+                    {
+                        "share_id": "share-1",
+                        "path": "docs/report.pdf",
+                        "entry_type": "file",
+                        "size": 1024,
+                        "modified_at_ms": 1717900000000,
+                        "modified_by": "dev-a",
+                        "version_vector": {
+                            "dev-a": 3
+                        },
+                        "sha256": "deadbeefcafef00d",
+                        "blocks": [
+                            {
+                                "index": 0,
+                                "size": 131072,
+                                "hash": "aaaa1111"
+                            },
+                            {
+                                "index": 1,
+                                "size": 65536,
+                                "hash": "bbbb2222"
+                            }
+                        ],
+                        "deleted": false,
+                        "deleted_at_ms": null
+                    }
+                ]
+            }
+        },
+        {
+            "name": "index with a directory entry (no blocks, no sha256)",
+            "dto": "IndexResponseDto",
+            "json": {
+                "share_id": "share-1",
+                "index_version": 43,
+                "entries": [
+                    {
+                        "share_id": "share-1",
+                        "path": "docs",
+                        "entry_type": "directory",
+                        "size": 0,
+                        "modified_at_ms": 1717900000000,
+                        "modified_by": "dev-a",
+                        "version_vector": {
+                            "dev-a": 1
+                        },
+                        "sha256": null,
+                        "blocks": [],
+                        "deleted": false,
+                        "deleted_at_ms": null
+                    }
+                ]
+            }
+        },
+        {
+            "name": "index with a tombstone (deleted entry) - must not be omitted, see ADR-009",
+            "dto": "IndexResponseDto",
+            "json": {
+                "share_id": "share-1",
+                "index_version": 44,
+                "entries": [
+                    {
+                        "share_id": "share-1",
+                        "path": "old_notes.txt",
+                        "entry_type": "file",
+                        "size": 0,
+                        "modified_at_ms": 1700000000000,
+                        "modified_by": "dev-b",
+                        "version_vector": {
+                            "dev-a": 2,
+                            "dev-b": 1
+                        },
+                        "sha256": null,
+                        "blocks": [],
+                        "deleted": true,
+                        "deleted_at_ms": 1700000500000
+                    }
+                ]
+            }
+        },
+        {
+            "name": "empty index (share with no entries yet)",
+            "dto": "IndexResponseDto",
+            "json": {
+                "share_id": "share-2",
+                "index_version": 0,
+                "entries": []
+            }
+        }
+    ]
+}

@@ -1,0 +1,69 @@
+[workspace]
+resolver = "2"
+members = [
+    "kfilesync-core",
+    "kfilesync-core-uniffi",
+    "kfilesync-conformance/rust-runner",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/kfilesync/kfilesync-core"
+authors = ["KFileSync Contributors"]
+
+[workspace.dependencies]
+# Serialization (small + fast, no_std friendly)
+serde = { version = "1", default-features = false, features = ["derive", "alloc"] }
+serde_json = { version = "1", default-features = false, features = ["alloc"] }
+serde-json-core = "0.6"
+
+# Cryptography
+blake3 = { version = "1.5", default-features = false }
+sha2 = { version = "0.10", default-features = false }
+subtle = { version = "2", default-features = false }
+zeroize = { version = "1.8", default-features = false, features = ["derive"] }
+
+# Containers (no_std compatible)
+hashbrown = { version = "0.15", default-features = false, features = ["serde"] }
+
+# .syncignore (walker disabled)
+ignore = { version = "0.4", default-features = false }
+
+# FFI (optional, gated by `ffi` feature)
+uniffi = { version = "0.28" }
+
+# Synchronization
+parking_lot = "0.12"
+
+# Errors
+thiserror = "1"
+
+# Testing
+proptest = "1"
+
+# --- Profiles ---
+# Scaffold ships with a conservative release profile.
+# Aggressive size-budget profile (LTO=fat, panic=abort, etc.) is enabled by
+# the production build script in `scripts/` (see CORE_DEVELOPMENT_PLAN.md §1.2).
+
+[profile.release]
+opt-level = "z"
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+overflow-checks = false
+debug = false
+incremental = false
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.bench]
+inherits = "release"
+debug = true
+strip = "none"

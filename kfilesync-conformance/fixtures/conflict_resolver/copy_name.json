@@ -1,0 +1,97 @@
+{
+    "name": "conflict copy filename generation",
+    "description": "conflict_copy_name(original_path, losing_device_id, conflict_at_ms). All timestamps are milliseconds since the Unix epoch (UTC), per ADR-006. Values were cross-checked against `date -u -d @<epoch_seconds>` during authoring.",
+    "cases": [
+        {
+            "name": "simple file with extension",
+            "original_path": "report.pdf",
+            "losing_device_id": "abcd1234ef567890",
+            "conflict_at_ms": 1781019000000,
+            "expected_name": "report.sync-conflict-20260609-153000-abcd1234.pdf"
+        },
+        {
+            "name": "nested directory prefix is preserved verbatim",
+            "original_path": "docs/team/notes.md",
+            "losing_device_id": "1122334455667788",
+            "conflict_at_ms": 1780000000000,
+            "expected_name": "docs/team/notes.sync-conflict-20260528-202640-11223344.md"
+        },
+        {
+            "name": "file with no extension",
+            "original_path": "README",
+            "losing_device_id": "aaaaaaaaaaaaaaaa",
+            "conflict_at_ms": 1700000000000,
+            "expected_name": "README.sync-conflict-20231114-221320-aaaaaaaa"
+        },
+        {
+            "name": "leading-dot dotfile has no extension",
+            "original_path": ".gitignore",
+            "losing_device_id": "bbbbbbbbbbbbbbbb",
+            "conflict_at_ms": 0,
+            "expected_name": ".gitignore.sync-conflict-19700101-000000-bbbbbbbb"
+        },
+        {
+            "name": "multi-dot filename splits on the last dot only",
+            "original_path": "archive.tar.gz",
+            "losing_device_id": "cccccccccccccccc",
+            "conflict_at_ms": 1609459200000,
+            "expected_name": "archive.tar.sync-conflict-20210101-000000-cccccccc.gz"
+        },
+        {
+            "name": "deeply nested path keeps every directory segment",
+            "original_path": "a/b/c/deep/file.txt",
+            "losing_device_id": "dddddddddddddddd",
+            "conflict_at_ms": 946684800000,
+            "expected_name": "a/b/c/deep/file.sync-conflict-20000101-000000-dddddddd.txt"
+        },
+        {
+            "name": "device id shorter than 8 chars is used in full, not padded",
+            "original_path": "f.txt",
+            "losing_device_id": "ab",
+            "conflict_at_ms": 0,
+            "expected_name": "f.sync-conflict-19700101-000000-ab.txt"
+        },
+        {
+            "name": "device id exactly 8 chars is used in full",
+            "original_path": "f.txt",
+            "losing_device_id": "exactly8",
+            "conflict_at_ms": 0,
+            "expected_name": "f.sync-conflict-19700101-000000-exactly8.txt"
+        },
+        {
+            "name": "millisecond just before midnight rounds down to the earlier second, not the next day",
+            "original_path": "notes",
+            "losing_device_id": "abcd1234",
+            "conflict_at_ms": 86399999,
+            "expected_name": "notes.sync-conflict-19700101-235959-abcd1234"
+        },
+        {
+            "name": "leap day is handled correctly",
+            "original_path": "notes.txt",
+            "losing_device_id": "eeeeeeeeeeeeeeee",
+            "conflict_at_ms": 1709164800000,
+            "expected_name": "notes.sync-conflict-20240229-000000-eeeeeeee.txt"
+        },
+        {
+            "name": "spaces in filename are preserved as-is",
+            "original_path": "My Documents/final report v2.docx",
+            "losing_device_id": "0123456789abcdef",
+            "conflict_at_ms": 1800000000000,
+            "expected_name": "My Documents/final report v2.sync-conflict-20270115-080000-01234567.docx"
+        },
+        {
+            "name": "extension case is preserved, not normalized",
+            "original_path": "photo.JPG",
+            "losing_device_id": "fedcba9876543210",
+            "conflict_at_ms": 1735689600000,
+            "expected_name": "photo.sync-conflict-20250101-000000-fedcba98.JPG"
+        },
+        {
+            "name": "dotfile with a real extension in a nested directory",
+            "original_path": "a/b/.hidden.cfg",
+            "losing_device_id": "11112222333344445555",
+            "conflict_at_ms": 1620000000000,
+            "expected_name": "a/b/.hidden.sync-conflict-20210503-000000-11112222.cfg"
+        }
+    ]
+}

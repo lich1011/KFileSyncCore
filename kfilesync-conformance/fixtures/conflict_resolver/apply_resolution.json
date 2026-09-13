@@ -1,0 +1,270 @@
+{
+    "name": "conflict_resolver apply_resolution",
+    "description": "apply_resolution(local, remote, resolution, me, now_ms). `local` and `remote` describe the same path with two divergent histories; only the fields that matter to this function are given (share_id/size/sha256/blocks/entry_type are irrelevant to the resolution logic and omitted here - see the Rust runner for the placeholder values it fills in). version_vector is a plain {device: counter} map, same convention as the version_vector fixtures. `expected_conflict_copy` is null unless resolution is keep_both.",
+    "cases": [
+        {
+            "name": "keep_local: content unchanged, versions merged, mtime untouched",
+            "local": {
+                "path": "f.txt",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1000,
+                "version_vector": {
+                    "dev-a": 1
+                },
+                "deleted": false
+            },
+            "remote": {
+                "path": "f.txt",
+                "modified_by": "dev-b",
+                "modified_at_ms": 2000,
+                "version_vector": {
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "resolution": "keep_local",
+            "me": "dev-a",
+            "now_ms": 9999,
+            "expected_primary": {
+                "path": "f.txt",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1000,
+                "version_vector": {
+                    "dev-a": 1,
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "expected_conflict_copy": null
+        },
+        {
+            "name": "keep_remote: content unchanged, versions merged, mtime untouched",
+            "local": {
+                "path": "f.txt",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1000,
+                "version_vector": {
+                    "dev-a": 1
+                },
+                "deleted": false
+            },
+            "remote": {
+                "path": "f.txt",
+                "modified_by": "dev-b",
+                "modified_at_ms": 2000,
+                "version_vector": {
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "resolution": "keep_remote",
+            "me": "dev-a",
+            "now_ms": 9999,
+            "expected_primary": {
+                "path": "f.txt",
+                "modified_by": "dev-b",
+                "modified_at_ms": 2000,
+                "version_vector": {
+                    "dev-a": 1,
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "expected_conflict_copy": null
+        },
+        {
+            "name": "keep_both: local keeps the path, remote is renamed aside as a fresh write by `me`",
+            "local": {
+                "path": "f.txt",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1000,
+                "version_vector": {
+                    "dev-a": 1
+                },
+                "deleted": false
+            },
+            "remote": {
+                "path": "f.txt",
+                "modified_by": "dev-b",
+                "modified_at_ms": 2000,
+                "version_vector": {
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "resolution": "keep_both",
+            "me": "dev-a",
+            "now_ms": 9999,
+            "expected_primary": {
+                "path": "f.txt",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1000,
+                "version_vector": {
+                    "dev-a": 1,
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "expected_conflict_copy": {
+                "path": "f.sync-conflict-19700101-000002-dev-b.txt",
+                "modified_by": "dev-a",
+                "modified_at_ms": 9999,
+                "version_vector": {
+                    "dev-a": 1,
+                    "dev-b": 1
+                },
+                "deleted": false
+            }
+        },
+        {
+            "name": "keep_local with multi-step version history and a nested path",
+            "local": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1800000000000,
+                "version_vector": {
+                    "dev-a": 3
+                },
+                "deleted": false
+            },
+            "remote": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-b",
+                "modified_at_ms": 1800500000000,
+                "version_vector": {
+                    "dev-b": 2
+                },
+                "deleted": false
+            },
+            "resolution": "keep_local",
+            "me": "dev-a",
+            "now_ms": 1900000000000,
+            "expected_primary": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1800000000000,
+                "version_vector": {
+                    "dev-a": 3,
+                    "dev-b": 2
+                },
+                "deleted": false
+            },
+            "expected_conflict_copy": null
+        },
+        {
+            "name": "keep_remote with multi-step version history and a nested path",
+            "local": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1800000000000,
+                "version_vector": {
+                    "dev-a": 3
+                },
+                "deleted": false
+            },
+            "remote": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-b",
+                "modified_at_ms": 1800500000000,
+                "version_vector": {
+                    "dev-b": 2
+                },
+                "deleted": false
+            },
+            "resolution": "keep_remote",
+            "me": "dev-a",
+            "now_ms": 1900000000000,
+            "expected_primary": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-b",
+                "modified_at_ms": 1800500000000,
+                "version_vector": {
+                    "dev-a": 3,
+                    "dev-b": 2
+                },
+                "deleted": false
+            },
+            "expected_conflict_copy": null
+        },
+        {
+            "name": "keep_both with multi-step version history and a nested path",
+            "local": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1800000000000,
+                "version_vector": {
+                    "dev-a": 3
+                },
+                "deleted": false
+            },
+            "remote": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-b",
+                "modified_at_ms": 1800500000000,
+                "version_vector": {
+                    "dev-b": 2
+                },
+                "deleted": false
+            },
+            "resolution": "keep_both",
+            "me": "dev-a",
+            "now_ms": 1900000000000,
+            "expected_primary": {
+                "path": "shared/notes.md",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1800000000000,
+                "version_vector": {
+                    "dev-a": 3,
+                    "dev-b": 2
+                },
+                "deleted": false
+            },
+            "expected_conflict_copy": {
+                "path": "shared/notes.sync-conflict-20270121-025320-dev-b.md",
+                "modified_by": "dev-a",
+                "modified_at_ms": 1900000000000,
+                "version_vector": {
+                    "dev-a": 1,
+                    "dev-b": 2
+                },
+                "deleted": false
+            }
+        },
+        {
+            "name": "tombstone fields pass through unchanged on the winning side (keep_remote, local is deleted, remote is alive)",
+            "local": {
+                "path": "old/file.bin",
+                "modified_by": "dev-a",
+                "modified_at_ms": 5000,
+                "version_vector": {
+                    "dev-a": 2
+                },
+                "deleted": true,
+                "deleted_at_ms": 5000
+            },
+            "remote": {
+                "path": "old/file.bin",
+                "modified_by": "dev-b",
+                "modified_at_ms": 6000,
+                "version_vector": {
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "resolution": "keep_remote",
+            "me": "dev-c",
+            "now_ms": 7000,
+            "expected_primary": {
+                "path": "old/file.bin",
+                "modified_by": "dev-b",
+                "modified_at_ms": 6000,
+                "version_vector": {
+                    "dev-a": 2,
+                    "dev-b": 1
+                },
+                "deleted": false
+            },
+            "expected_conflict_copy": null
+        }
+    ]
+}

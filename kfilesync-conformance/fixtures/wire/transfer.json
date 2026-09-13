@@ -1,0 +1,107 @@
+{
+    "name": "wire round-trip: transfers",
+    "description": "See wire/discovery.json for the fixture format. Covers TransferRequestDto (nesting TransferItemDto), TransferAcceptDto, TransferChunkAckDto, TransferCancelDto. Note the actual chunk body is raw bytes with an X-Chunk-Hash header, not JSON - TransferChunkAckDto is only the small bookkeeping ack sent back per chunk.",
+    "cases": [
+        {
+            "name": "TransferRequestDto: single file with three chunks",
+            "dto": "TransferRequestDto",
+            "json": {
+                "job_id": "job-1",
+                "session_id": "sess-1",
+                "from_device_id": "dev-a",
+                "from_alias": "Alice's Laptop",
+                "share_id": "share-1",
+                "files": [
+                    {
+                        "file_id": "file-1",
+                        "path": "photos/beach.jpg",
+                        "size": 300000,
+                        "sha256": "deadbeefcafef00d",
+                        "chunk_size": 131072,
+                        "chunk_hashes": [
+                            "h1aaaa",
+                            "h2bbbb",
+                            "h3cccc"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TransferRequestDto: not share-scoped (share_id is null)",
+            "dto": "TransferRequestDto",
+            "json": {
+                "job_id": "job-2",
+                "session_id": "sess-2",
+                "from_device_id": "dev-b",
+                "from_alias": "Bob's Phone",
+                "share_id": null,
+                "files": []
+            }
+        },
+        {
+            "name": "TransferAcceptDto: accepted, resuming with some chunks already present",
+            "dto": "TransferAcceptDto",
+            "json": {
+                "session_id": "sess-1",
+                "job_id": "job-1",
+                "accepted": true,
+                "reason": null,
+                "skip_chunks": {
+                    "file-1": [
+                        0,
+                        2,
+                        5
+                    ]
+                }
+            }
+        },
+        {
+            "name": "TransferAcceptDto: declined outright",
+            "dto": "TransferAcceptDto",
+            "json": {
+                "session_id": "sess-1",
+                "job_id": "job-1",
+                "accepted": false,
+                "reason": "share is paused",
+                "skip_chunks": {}
+            }
+        },
+        {
+            "name": "TransferChunkAckDto: verified",
+            "dto": "TransferChunkAckDto",
+            "json": {
+                "job_id": "job-1",
+                "file_id": "file-1",
+                "chunk_index": 2,
+                "verified": true
+            }
+        },
+        {
+            "name": "TransferChunkAckDto: hash mismatch",
+            "dto": "TransferChunkAckDto",
+            "json": {
+                "job_id": "job-1",
+                "file_id": "file-1",
+                "chunk_index": 2,
+                "verified": false
+            }
+        },
+        {
+            "name": "TransferCancelDto: with reason",
+            "dto": "TransferCancelDto",
+            "json": {
+                "job_id": "job-1",
+                "reason": "user cancelled"
+            }
+        },
+        {
+            "name": "TransferCancelDto: no reason",
+            "dto": "TransferCancelDto",
+            "json": {
+                "job_id": "job-1",
+                "reason": null
+            }
+        }
+    ]
+}

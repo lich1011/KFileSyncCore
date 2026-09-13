@@ -1,0 +1,69 @@
+{
+    "name": "version vector ancestor relationship",
+    "description": "Tests is_ancestor_of and conflicts_with for representative vector pairs.",
+    "cases": [
+        {
+            "name": "empty is ancestor of anything",
+            "a": {},
+            "b": {
+                "device-a": 1,
+                "device-b": 2
+            },
+            "expected_a_ancestor_of_b": true,
+            "expected_b_ancestor_of_a": false,
+            "expected_conflict": false
+        },
+        {
+            "name": "identical vectors are mutual ancestors",
+            "a": {
+                "device-a": 5
+            },
+            "b": {
+                "device-a": 5
+            },
+            "expected_a_ancestor_of_b": true,
+            "expected_b_ancestor_of_a": true,
+            "expected_conflict": false
+        },
+        {
+            "name": "linear progression",
+            "a": {
+                "device-a": 2,
+                "device-b": 3
+            },
+            "b": {
+                "device-a": 2,
+                "device-b": 5
+            },
+            "expected_a_ancestor_of_b": true,
+            "expected_b_ancestor_of_a": false,
+            "expected_conflict": false
+        },
+        {
+            "name": "concurrent edits conflict",
+            "a": {
+                "device-a": 1
+            },
+            "b": {
+                "device-b": 1
+            },
+            "expected_a_ancestor_of_b": false,
+            "expected_b_ancestor_of_a": false,
+            "expected_conflict": true
+        },
+        {
+            "name": "partial overlap conflict",
+            "a": {
+                "device-a": 3,
+                "device-b": 1
+            },
+            "b": {
+                "device-a": 1,
+                "device-b": 3
+            },
+            "expected_a_ancestor_of_b": false,
+            "expected_b_ancestor_of_a": false,
+            "expected_conflict": true
+        }
+    ]
+}

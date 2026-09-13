@@ -1,0 +1,683 @@
+{
+    "name": "trust evaluator: evaluate_inbound",
+    "description": "Each case runs one or more requests against ONE shared PairedDeviceSet + NonceWindowState (a fresh state per case; the state only carries over across requests WITHIN a case, for the replay-detection cases). window_size_ms/clock_skew_ms apply to every request in the case. expected.kind is 'allow', 'allow_unpaired', or 'reject'.",
+    "cases": [
+        {
+            "name": "rule1: missing device_id header is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": null,
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "missing_anti_replay_headers"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule1: missing timestamp header is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": null,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "missing_anti_replay_headers"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule1: missing nonce header is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": null,
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "missing_anti_replay_headers"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule1: blank (whitespace-only) nonce header is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "   ",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "missing_anti_replay_headers"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule2: timestamp older than the window is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 699999,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "stale_or_future_timestamp"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule2: timestamp exactly at the stale boundary is accepted (inclusive)",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 700000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "aabbccdd",
+                    "clock_now_ms": 1000000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule2: timestamp farther in the future than the skew tolerance is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1300001,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "stale_or_future_timestamp"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule2: timestamp exactly at the future boundary is accepted (inclusive)",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1300000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "aabbccdd",
+                    "clock_now_ms": 1000000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule3: replaying the same (device_id, nonce) is rejected on the second request",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                },
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1010,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1010,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "nonce_replay"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule3: two distinct nonces from the same device are both accepted",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                },
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1010,
+                    "nonce_header": "n2",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1010,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule3: the same nonce string from two different (paired) devices does not collide",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                },
+                {
+                    "device_id": "dev-b",
+                    "cert_fingerprint_hex": "11223344"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "shared",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                },
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-b",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "shared",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-b",
+                        "peer_fingerprint": "11223344"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule4: unpaired device is rejected on a normal (non-bootstrap) route",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-unknown",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 403,
+                        "error_code": "unknown_peer"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule4: device_id lookup is case-sensitive (no folding)",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "DEV-A",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 403,
+                        "error_code": "unknown_peer"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule4: bootstrap route (pair/request) skips the paired-device check entirely",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/pair/request",
+                    "device_id_header": "dev-unknown",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow_unpaired"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule4: bootstrap route (pair/confirm) also skips the paired-device check",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/pair/confirm",
+                    "device_id_header": "dev-unknown",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow_unpaired"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule4: bootstrap route still enforces rule 1 (missing headers)",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/pair/request",
+                    "device_id_header": "dev-unknown",
+                    "timestamp_ms_header": null,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "missing_anti_replay_headers"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule4: bootstrap route still enforces rule 2 (stale timestamp)",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/register",
+                    "device_id_header": "dev-unknown",
+                    "timestamp_ms_header": 0,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "stale_or_future_timestamp"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule5: matching fingerprint header is allowed",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "aabbccdd",
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule5: mismatched fingerprint header is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "00000000",
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 403,
+                        "error_code": "fingerprint_mismatch"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule5: different case in the fingerprint header counts as a mismatch (no case folding)",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "AABBCCDD",
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 403,
+                        "error_code": "fingerprint_mismatch"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule5: absent fingerprint header skips the check (still allowed)",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": null,
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "happy path: fully valid request on a normal route is allowed",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/transfer/request",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "aabbccdd",
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-a",
+                        "peer_fingerprint": "aabbccdd"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "multiple paired devices: lookup resolves the correct entry",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                },
+                {
+                    "device_id": "dev-b",
+                    "cert_fingerprint_hex": "11223344"
+                },
+                {
+                    "device_id": "dev-c",
+                    "cert_fingerprint_hex": "55667788"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-b",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "11223344",
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "allow",
+                        "peer_device_id": "dev-b",
+                        "peer_fingerprint": "11223344"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule ordering: an unpaired AND fingerprint-mismatched device reports unknown_peer, not fingerprint_mismatch",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-unknown",
+                    "timestamp_ms_header": 1000,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "wrongvalue",
+                    "clock_now_ms": 1000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 403,
+                        "error_code": "unknown_peer"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "rule ordering: a stale timestamp is reported even when headers would otherwise be fully valid and paired",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "paired_devices": [
+                {
+                    "device_id": "dev-a",
+                    "cert_fingerprint_hex": "aabbccdd"
+                }
+            ],
+            "requests": [
+                {
+                    "route": "/api/lansync/v1/sync/index",
+                    "device_id_header": "dev-a",
+                    "timestamp_ms_header": 0,
+                    "nonce_header": "n1",
+                    "fingerprint_header": "aabbccdd",
+                    "clock_now_ms": 1000000,
+                    "expected": {
+                        "kind": "reject",
+                        "http_status": 401,
+                        "error_code": "stale_or_future_timestamp"
+                    }
+                }
+            ]
+        }
+    ]
+}

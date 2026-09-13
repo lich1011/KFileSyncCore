@@ -1,0 +1,11 @@
+# Default toolchain for local development.
+#
+# Scaffold builds with stable Rust. The product size-budget build uses 1.76
+# nightly + `-Z build-std` for an additional ~300KB saving - see
+# `scripts/build-android.sh` and `scripts/build-ios.sh`
+
+[toolchain]
+channel = "stable"
+components = ["clippy", "rustfmt"]
+# Mobile build targets are added on demand by the build scripts; we don't
+# preinstall them here to avoid a slow first checkout.

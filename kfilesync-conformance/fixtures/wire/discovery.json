@@ -1,0 +1,36 @@
+{
+    "name": "wire round-trip: discovery",
+    "description": "Each case gives a DTO name and a JSON payload. The runner deserializes it into the Rust DTO, serializes it back to Value, and asserts equality with the original.",
+    "cases": [
+        {
+            "name": "DeviceInfoDto: desktop device",
+            "dto": "DeviceInfoDto",
+            "json": {
+                "protocol": "Lansync",
+                "version": "1.0",
+                "device_id": "dev-a",
+                "alias": "Alice's Laptop",
+                "device_type": "desktop",
+                "platform": "macos",
+                "fingerprint": "deadbeefcafef00d0011223344556677",
+                "port": 53317,
+                "announce": true
+            }
+        },
+        {
+            "name": "DeviceInfoDto: mobile device without announcement",
+            "dto": "DeviceInfoDto",
+            "json": {
+                "protocol": "Lansync",
+                "version": "1.0",
+                "device_id": "dev-b",
+                "alias": "Bob's Phone",
+                "device_type": "mobile",
+                "platform": "android",
+                "fingerprint": "112233445566778899aabbccddeeff00",
+                "port": 53317,
+                "announce": false
+            }
+        }
+    ]
+}

@@ -1,0 +1,66 @@
+{
+    "name": "chunking threshold boundaries",
+    "description": "Tests the 5-tier size-based chunking decision at every boundary plus a few interior points. Both desktop (Rust) and mobile (Kotlin via UniFFI) must compute identical chunk sizes for the same file_size.",
+    "cases": [
+        {
+            "file_size": 0,
+            "expected_chunk_size": 0
+        },
+        {
+            "file_size": 1,
+            "expected_chunk_size": 0
+        },
+        {
+            "file_size": 100000,
+            "expected_chunk_size": 0
+        },
+        {
+            "file_size": 131072,
+            "expected_chunk_size": 0
+        },
+        {
+            "file_size": 131073,
+            "expected_chunk_size": 131072
+        },
+        {
+            "file_size": 1000000,
+            "expected_chunk_size": 131072
+        },
+        {
+            "file_size": 268435456,
+            "expected_chunk_size": 131072
+        },
+        {
+            "file_size": 268435457,
+            "expected_chunk_size": 1048576
+        },
+        {
+            "file_size": 500000000,
+            "expected_chunk_size": 1048576
+        },
+        {
+            "file_size": 1073741824,
+            "expected_chunk_size": 1048576
+        },
+        {
+            "file_size": 1073741825,
+            "expected_chunk_size": 4194304
+        },
+        {
+            "file_size": 8589934592,
+            "expected_chunk_size": 4194304
+        },
+        {
+            "file_size": 17179869184,
+            "expected_chunk_size": 4194304
+        },
+        {
+            "file_size": 17179869185,
+            "expected_chunk_size": 16777216
+        },
+        {
+            "file_size": 107374182400,
+            "expected_chunk_size": 16777216
+        }
+    ]
+}

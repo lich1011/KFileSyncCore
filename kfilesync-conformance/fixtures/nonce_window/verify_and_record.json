@@ -1,0 +1,223 @@
+{
+    "name": "nonce window verify_and_record",
+    "description": "Each case replays an ordered sequence of calls against ONE shared NonceWindowState (steps run in order, state carries over within a case; a fresh state is used per case). window_size_ms/clock_skew_ms apply to every step in the case.",
+    "cases": [
+        {
+            "name": "fresh tuple is accepted",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1000,
+                    "nonce": "n1",
+                    "now_ms": 1000,
+                    "expected_verdict": "fresh"
+                }
+            ]
+        },
+        {
+            "name": "empty nonce is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1000,
+                    "nonce": "",
+                    "now_ms": 1000,
+                    "expected_verdict": "blank_nonce"
+                }
+            ]
+        },
+        {
+            "name": "whitespace-only nonce is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1000,
+                    "nonce": "   ",
+                    "now_ms": 1000,
+                    "expected_verdict": "blank_nonce"
+                }
+            ]
+        },
+        {
+            "name": "replay of the same nonce from the same device is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1000,
+                    "nonce": "n1",
+                    "now_ms": 1000,
+                    "expected_verdict": "fresh"
+                },
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1010,
+                    "nonce": "n1",
+                    "now_ms": 1010,
+                    "expected_verdict": "replay"
+                }
+            ]
+        },
+        {
+            "name": "same nonce string from two different devices does not collide",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1000,
+                    "nonce": "shared",
+                    "now_ms": 1000,
+                    "expected_verdict": "fresh"
+                },
+                {
+                    "device_id": "dev-b",
+                    "timestamp_ms": 1000,
+                    "nonce": "shared",
+                    "now_ms": 1000,
+                    "expected_verdict": "fresh"
+                }
+            ]
+        },
+        {
+            "name": "stale timestamp boundary is inclusive at exactly now - window",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 700000,
+                    "nonce": "at-edge",
+                    "now_ms": 1000000,
+                    "expected_verdict": "fresh"
+                }
+            ]
+        },
+        {
+            "name": "one ms past the stale boundary is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 699999,
+                    "nonce": "past-edge",
+                    "now_ms": 1000000,
+                    "expected_verdict": "stale_timestamp"
+                }
+            ]
+        },
+        {
+            "name": "future timestamp boundary is inclusive at exactly now + skew",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1300000,
+                    "nonce": "at-edge",
+                    "now_ms": 1000000,
+                    "expected_verdict": "fresh"
+                }
+            ]
+        },
+        {
+            "name": "one ms past the future boundary is rejected",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1300001,
+                    "nonce": "past-edge",
+                    "now_ms": 1000000,
+                    "expected_verdict": "future_timestamp"
+                }
+            ]
+        },
+        {
+            "name": "stale check takes priority over replay check for an aged-out nonce reused with a stale timestamp",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 10000000,
+                    "nonce": "n1",
+                    "now_ms": 10000000,
+                    "expected_verdict": "fresh"
+                },
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 9699999,
+                    "nonce": "n1",
+                    "now_ms": 10000000,
+                    "expected_verdict": "stale_timestamp"
+                }
+            ]
+        },
+        {
+            "name": "a nonce becomes fresh again once it ages out of the live window",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 0,
+                    "nonce": "n1",
+                    "now_ms": 0,
+                    "expected_verdict": "fresh"
+                },
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 300001,
+                    "nonce": "n1",
+                    "now_ms": 300001,
+                    "expected_verdict": "fresh"
+                }
+            ]
+        },
+        {
+            "name": "three distinct nonces from one device are all fresh, a fourth repeat is a replay",
+            "window_size_ms": 300000,
+            "clock_skew_ms": 300000,
+            "steps": [
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 0,
+                    "nonce": "n1",
+                    "now_ms": 0,
+                    "expected_verdict": "fresh"
+                },
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 1,
+                    "nonce": "n2",
+                    "now_ms": 1,
+                    "expected_verdict": "fresh"
+                },
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 2,
+                    "nonce": "n3",
+                    "now_ms": 2,
+                    "expected_verdict": "fresh"
+                },
+                {
+                    "device_id": "dev-a",
+                    "timestamp_ms": 3,
+                    "nonce": "n2",
+                    "now_ms": 3,
+                    "expected_verdict": "replay"
+                }
+            ]
+        }
+    ]
+}
