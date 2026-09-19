@@ -21,6 +21,7 @@ use crate::domain::FileEntry;
 /// How a conflict should be resolved. The caller (host application) picks
 /// one of these; this module only carries it out.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 pub enum ConflictResolution {
     /// Keep the local entry as-is; remote's conflicting write is discarded
     /// (only its version-vector history is absorbed, to stop the same
@@ -38,6 +39,7 @@ pub enum ConflictResolution {
 }
 
 /// Outcome of applying a [`ConflictResolution`] to a `(local, remote)` pair.
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct ResolutionOutcome {
     /// The new state at the original path.
     pub primary: FileEntry,
@@ -69,6 +71,7 @@ pub struct ResolutionOutcome {
 ///
 /// This function is pure: the same inputs always produce the same output.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn conflict_copy_name(
     original_path: &str,
     losing_device_id: &str,
@@ -113,6 +116,7 @@ pub fn conflict_copy_name(
 /// not a new causal write, so it must not appear as one to peers on the
 /// next sync (see ADR-007).
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn apply_resolution(
     local: &FileEntry,
     remote: &FileEntry,

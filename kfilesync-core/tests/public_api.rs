@@ -115,14 +115,14 @@ fn policy_enforcer_public_api() {
 
     let decision = evaluate_policy(
         &peer,
-        Some(&share),
+        Some(share.clone()),
         Some(SharePermission::ReadWrite),
         SyncDirection::Push,
     );
     assert_eq!(decision, PolicyDecision::Allowed);
 
     // No membership row at all is the most common real-world rejection.
-    let rejected = evaluate_policy(&peer, Some(&share), None, SyncDirection::Push);
+    let rejected = evaluate_policy(&peer, Some(share.clone()), None, SyncDirection::Push);
     assert_eq!(rejected, PolicyDecision::NotAMember);
 }
 

@@ -33,7 +33,7 @@ hashbrown = { version = "0.15", default-features = false, features = ["serde"] }
 ignore = { version = "0.4", default-features = false }
 
 # FFI (optional, gated by `ffi` feature)
-uniffi = { version = "0.28" }
+uniffi = { version = "0.29" }
 
 # Synchronization
 parking_lot = "0.12"

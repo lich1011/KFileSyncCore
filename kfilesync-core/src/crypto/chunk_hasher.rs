@@ -20,6 +20,7 @@ use crate::crypto::to_hex_lower;
 /// assert!(hex.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()));
 /// ```
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn hash_chunk(data: &[u8]) -> String {
     let digest = blake3::hash(data);
     to_hex_lower(digest.as_bytes())
@@ -29,6 +30,7 @@ pub fn hash_chunk(data: &[u8]) -> String {
 ///
 /// Used on the receiver side after pulling a chunk from the wire.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn verify_chunk(data: &[u8], expected_hex: &str) -> bool {
     let actual: String = hash_chunk(data);
     use subtle::ConstantTimeEq;

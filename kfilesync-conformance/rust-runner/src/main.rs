@@ -169,11 +169,10 @@ fn run_ignore_spec(raw: &str, path: &Path) -> Result<bool> {
     let mut ok = true;
 
     for case in &fixture.cases {
-        let rules: Vec<&str> = case.extra_user_rules.iter().map(String::as_str).collect();
         let spec = IgnoreSpec::build(
             "/share",
-            case.syncignore_content.as_deref(),
-            &rules,
+            case.syncignore_content.clone(),
+            &case.extra_user_rules,
             case.is_mobile,
         )
         .with_context(|| format!("building IgnoreSpec for case '{}'", case.name))?;

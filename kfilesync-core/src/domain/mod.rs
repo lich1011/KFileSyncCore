@@ -16,5 +16,5 @@ pub use device::{Device, DeviceId, DevicePlatform, DeviceState, DeviceType};
 pub use file_entry::{BlockInfo, EntryType, FileEntry};
 pub use pairing::{PairingSession, SecretPin};
 pub use share::{Share, ShareId, SharePermission, ShareStatus, SyncMode};
-pub use transfer::{TransferItem, TransferJob, TransferState};
+pub use transfer::{Checkpoint, TransferDirection, TransferItem, TransferJob, TransferState};
 pub use version_vector::VersionVector;

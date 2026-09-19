@@ -9,6 +9,7 @@ use crate::service::nonce_window::{verify_and_record, NonceVerdict, NonceWindowS
 
 /// Outcome of replay-guard verification.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 pub enum ReplayGuardOutcome {
     /// Tuple accepted and recorded.
     Ok,

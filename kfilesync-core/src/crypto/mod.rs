@@ -12,6 +12,7 @@ use alloc::string::String;
 
 /// Lowercase hex encoder used throughout the crate.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn to_hex_lower(bytes: &[u8]) -> String {
     let mut out: String = String::with_capacity(bytes.len() * 2);
     for &b in bytes {

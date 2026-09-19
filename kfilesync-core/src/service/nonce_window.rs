@@ -52,6 +52,7 @@ impl NonceWindowState {
 
 /// Result of verifying a request's anti-replay tuple.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 pub enum NonceVerdict {
     /// Tuple is acceptable and has been recorded.
     Fresh,

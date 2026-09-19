@@ -15,6 +15,7 @@ use crate::trust::replay_guard::{self, ReplayGuardOutcome};
 
 /// Request metadata extracted from headers by the host before calling
 /// [`evaluate_inbound`].
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct RequestMeta {
     /// HTTP path being handled (e.g. "/api/lansync/v1/pair/request").
     pub route: String,
@@ -36,6 +37,7 @@ pub struct PairedDeviceSet {
 
 /// One paired device's identifying data (fingerprint comparison only).
 #[derive(Clone)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct PairedDeviceEntry {
     /// Peer's stable device ID.
     pub device_id: String,

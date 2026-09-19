@@ -21,6 +21,7 @@ use crate::domain::VersionVector;
 /// Symlinks were dropped in the unified wire format because mobile platforms
 /// do not represent them uniformly - see ADR-008.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 #[serde(rename_all = "lowercase")]
 pub enum EntryType {
     /// Regular file.
@@ -33,6 +34,7 @@ pub enum EntryType {
 ///
 /// `hash` is BLAKE3 hex (lowercase, 64 chars).
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct BlockInfo {
     /// Zero-based chunk index inside the file.
     pub index: u32,
@@ -46,6 +48,7 @@ pub struct BlockInfo {
 ///
 /// All time fields are **milliseconds since the Unix epoch** - see ADR-006.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct FileEntry {
     /// Identifier of the share containing this entry.
     pub share_id: String,

@@ -12,8 +12,12 @@ use serde::{Deserialize, Serialize};
 #[serde(transparent)]
 pub struct ShareId(pub String);
 
+#[cfg(feature = "ffi")]
+uniffi::custom_newtype!(ShareId,String);
+
 /// Permission level for a share member.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 #[serde(rename_all = "snake_case")]
 pub enum SharePermission {
     /// May only receive (pull).
@@ -24,6 +28,7 @@ pub enum SharePermission {
 
 /// Global direction policy for a share.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 #[serde(rename_all = "snake_case")]
 pub enum SyncMode {
     /// Push and pull.
@@ -36,6 +41,7 @@ pub enum SyncMode {
 
 /// Lifecycle status of a share (host-side, not used in wire protocol).
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 #[serde(rename_all = "snake_case")]
 pub enum ShareStatus {
     /// Waiting for the invitee to authorize.
@@ -50,6 +56,7 @@ pub enum ShareStatus {
 
 /// A shared folder definition.
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct Share {
     /// Stable identifier.
     pub id: ShareId,

@@ -16,6 +16,7 @@ use crate::domain::{Device, DeviceState, Share, SharePermission, ShareStatus, Sy
 /// view**: `Push` = peer sends data to us (we would receive); `Pull` =
 /// peer requests data from us (we would send). See ADR-013.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 pub enum SyncDirection {
     /// Peer -> us.
     Push,
@@ -25,6 +26,7 @@ pub enum SyncDirection {
 
 /// Decision returned by `evaluate_policy`.
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 pub enum PolicyDecision {
     /// Action permitted.
     Allowed,
@@ -62,9 +64,10 @@ pub enum PolicyDecision {
 /// storage - core does not own membership data, see ADR-013); pass `None`
 /// if the peer has no membership row at all.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn evaluate_policy(
     peer: &Device,
-    share: Option<&Share>,
+    share: Option<Share>,
     member_permission: Option<SharePermission>,
     direction: SyncDirection,
 ) -> PolicyDecision {
@@ -132,7 +135,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Push
             ),
@@ -161,7 +164,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Push
             ),
@@ -176,7 +179,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Pull
             ),
@@ -189,7 +192,7 @@ mod tests {
         let d = device(DeviceState::Paired);
         let s = share(SyncMode::TwoWay, ShareStatus::Active);
         assert_eq!(
-            evaluate_policy(&d, Some(&s), None, SyncDirection::Push),
+            evaluate_policy(&d, Some(s.clone()), None, SyncDirection::Push),
             PolicyDecision::NotAMember
         );
     }
@@ -201,7 +204,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadOnly),
                 SyncDirection::Push
             ),
@@ -216,7 +219,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadOnly),
                 SyncDirection::Pull
             ),
@@ -233,7 +236,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Push
             ),
@@ -248,7 +251,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Pull
             ),
@@ -263,7 +266,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Pull
             ),
@@ -278,7 +281,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Push
             ),
@@ -293,7 +296,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Push
             ),
@@ -302,7 +305,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadWrite),
                 SyncDirection::Pull
             ),
@@ -320,7 +323,7 @@ mod tests {
         assert_eq!(
             evaluate_policy(
                 &d,
-                Some(&s),
+                Some(s.clone()),
                 Some(SharePermission::ReadOnly),
                 SyncDirection::Push
             ),

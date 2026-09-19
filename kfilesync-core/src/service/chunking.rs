@@ -30,6 +30,7 @@ use crate::invariants::chunk_sizes::{self, *};
 /// assert_eq!(compute_chunk_size(500 * 1024 * 1024), 1024 * 1024); // 1 MiB chunks
 /// ```
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub const fn compute_chunk_size(file_size: u64) -> u32 {
     if file_size <= chunk_sizes::UNCHUNKED_MAX {
         0
@@ -49,6 +50,7 @@ pub const fn compute_chunk_size(file_size: u64) -> u32 {
 ///
 /// Returns 0 when the file is unchunked.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub const fn compute_chunk_count(file_size: u64) -> u32 {
     let chunk_size: u32 = compute_chunk_size(file_size);
     if chunk_size == 0 {

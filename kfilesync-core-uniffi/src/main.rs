@@ -8,7 +8,7 @@
 //!
 //! ```text
 //! cargo run -p kfilesync-core-uniffi -- \
-//!     generate ../kfilesync-core/src/kfilesync_core.udl \
+//!     generate --libary ../target/debug/kfilesync-core.so \
 //!     --language kotlin \
 //!     --out-dir ./generated-bindings
 //! ```

@@ -46,8 +46,46 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use serde::{Deserialize, Serialize};
 
+// UniFFI has no native support for `BTreeMap` (only `HashMap`). A type
+// *alias* for a bare `BTreeMap<String, u64>` doesn't work as a
+// `uniffi::custom_type!` target either: aliases are transparent, so the
+// generated `impl<UT> FfiConverter<UT> for BTreeMap<String, u64>` trips
+// Rust's orphan-coherence rule (E0210) - `BTreeMap` is just as foreign as
+// `HashMap` is, alias or not. A local newtype sidesteps this the same way
+// `domain::ShareId`/`DeviceId` do for `String`: it's a nominal type this
+// crate owns, so `uniffi::custom_type!` can legally target it. `#[serde
+// (transparent)]` keeps the wire JSON shape identical to a bare map either
+// way - this is purely an FFI-bridging concern, invisible on the wire.
+/// `{device_id: counter}` map - wraps `BTreeMap` so it can bridge to
+/// UniFFI's `HashMap` via [`uniffi::custom_type!`] (see the comment above
+/// on why a bare `BTreeMap` can't be a `custom_type!` target directly).
+/// `#[serde(transparent)]` keeps the wire JSON shape identical to a bare
+/// map - this wrapper is purely an FFI-bridging concern.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(transparent)]
+pub struct VersionVectorMap(pub BTreeMap<String, u64>);
+
+#[cfg(feature = "ffi")]
+uniffi::custom_type!(VersionVectorMap, std::collections::HashMap<String, u64>, {
+    lower: |m| m.0.into_iter().collect(),
+    try_lift: |v| Ok(VersionVectorMap(v.into_iter().collect())),
+});
+
+/// `{file_id: [chunk_index, ...]}` map - see [`VersionVectorMap`] for why
+/// this wraps `BTreeMap` instead of exposing it directly.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(transparent)]
+pub struct SkipChunksMap(pub BTreeMap<String, Vec<u32>>);
+
+#[cfg(feature = "ffi")]
+uniffi::custom_type!(SkipChunksMap, std::collections::HashMap<String, Vec<u32>>, {
+    lower: |m| m.0.into_iter().collect(),
+    try_lift: |v| Ok(SkipChunksMap(v.into_iter().collect())),
+});
+
 /// Response body for `GET /info`.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct DeviceInfoDto {
     /// Protocol family - always `"Lansync"`.
     pub protocol: String,
@@ -75,6 +113,7 @@ pub struct DeviceInfoDto {
 
 /// Body of `POST /pair/request` - initiate a pairing handshake.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct PairRequestDto {
     /// Correlates this request with its eventual `/pair/confirm` call.
     pub request_id: String,
@@ -98,6 +137,7 @@ pub struct PairRequestDto {
 /// Body of `POST /pair/confirm` - complete the dual-PIN OOB ceremony (see
 /// `trust::pairing_state`, Sprint 5) and exchange certificates.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct PairConfirmDto {
     /// Same `request_id` from the original [`PairRequestDto`].
     pub request_id: String,
@@ -110,6 +150,7 @@ pub struct PairConfirmDto {
 
 /// Body of `POST /pair/revoke` - tell a peer their trust has been revoked.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct PairRevokeDto {
     /// Device whose trust is being revoked.
     pub device_id: String,
@@ -125,6 +166,7 @@ pub struct PairRevokeDto {
 /// `false`, meaning "pending", not "rejected"; callers distinguish the two
 /// by request state, not by this DTO alone).
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct PairResultDto {
     /// Same `request_id` from the original [`PairRequestDto`].
     pub request_id: String,
@@ -143,6 +185,7 @@ pub struct PairResultDto {
 
 /// Body of `POST /share/invite` - invite an already-paired peer to a share.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct ShareInviteDto {
     /// Stable share identifier.
     pub share_id: String,
@@ -161,6 +204,7 @@ pub struct ShareInviteDto {
 /// Body of `POST /share/authorize` - invitee's response to a
 /// [`ShareInviteDto`].
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct ShareAuthorizeDto {
     /// The share being authorized (or declined).
     pub share_id: String,
@@ -173,6 +217,7 @@ pub struct ShareAuthorizeDto {
 /// Body of `POST /share/leave` - voluntarily leave a share, or notify a
 /// peer that this device has left.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct ShareLeaveDto {
     /// The share being left.
     pub share_id: String,
@@ -188,6 +233,7 @@ pub struct ShareLeaveDto {
 
 /// One chunk's metadata within [`FileEntryDto::blocks`].
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct BlockInfoDto {
     /// Zero-based chunk index within the file.
     pub index: u32,
@@ -200,6 +246,7 @@ pub struct BlockInfoDto {
 /// Wire shape of one `domain::FileEntry`, as it travels in an
 /// [`IndexResponseDto`].
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct FileEntryDto {
     /// Share containing this entry (repeated per-entry, not just at the
     /// top level, so a client processing entries streamed/paginated
@@ -217,7 +264,7 @@ pub struct FileEntryDto {
     /// Device ID of the last writer.
     pub modified_by: String,
     /// Causal version vector, `{"device_id": counter}`.
-    pub version_vector: BTreeMap<String, u64>,
+    pub version_vector: VersionVectorMap,
     /// SHA-256 hex of the full file content (`None` for directories).
     pub sha256: Option<String>,
     /// Per-chunk block list (empty for unchunked files and directories).
@@ -230,6 +277,7 @@ pub struct FileEntryDto {
 
 /// Response body for `GET /sync/index`.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct IndexResponseDto {
     /// The share this index describes.
     pub share_id: String,
@@ -247,6 +295,7 @@ pub struct IndexResponseDto {
 
 /// One file within a [`TransferRequestDto`].
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct TransferItemDto {
     /// Stable identifier for this file within the transfer job.
     pub file_id: String,
@@ -266,6 +315,7 @@ pub struct TransferItemDto {
 
 /// Body of `POST /transfer/request` - propose a transfer job.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct TransferRequestDto {
     /// Stable identifier for this transfer job.
     pub job_id: String,
@@ -283,6 +333,7 @@ pub struct TransferRequestDto {
 
 /// Response body for `POST /transfer/request`.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct TransferAcceptDto {
     /// Same `session_id` from the [`TransferRequestDto`].
     pub session_id: String,
@@ -296,13 +347,14 @@ pub struct TransferAcceptDto {
     /// Per-file list of chunk indices the receiver already has (e.g. from
     /// a previously interrupted transfer) and does not need re-sent.
     /// Keyed by `file_id`.
-    pub skip_chunks: BTreeMap<String, Vec<u32>>,
+    pub skip_chunks: SkipChunksMap,
 }
 
 /// Small JSON ack sent back after each chunk upload. The chunk body
 /// itself travels as raw bytes with a `X-Chunk-Hash` header (not as JSON -
 /// see ADR-014), so this DTO only carries the bookkeeping.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct TransferChunkAckDto {
     /// The transfer job this chunk belongs to.
     pub job_id: String,
@@ -316,6 +368,7 @@ pub struct TransferChunkAckDto {
 
 /// Body of `POST /transfer/cancel`.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct TransferCancelDto {
     /// The transfer job being cancelled.
     pub job_id: String,

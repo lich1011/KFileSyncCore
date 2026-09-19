@@ -5,6 +5,8 @@
 //! Currently a placeholder. Full implementation in Sprint 5.
 
 use alloc::string::String;
+#[cfg(feature = "ffi")]
+use alloc::string::ToString;
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
@@ -13,6 +15,16 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 #[derive(Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 #[serde(transparent)]
 pub struct SecretPin(String);
+
+// Exposed to FFI hosts (mobile UI needs to display/collect PINs during the
+// pairing ceremony) as a plain `String`. This deliberately punches through
+// the in-process zeroize/redaction guarantees at the FFI boundary - the
+// value must cross into Kotlin/Swift memory as text either way.
+#[cfg(feature = "ffi")]
+uniffi::custom_type!(SecretPin, String, {
+    lower: |p| p.expose().to_string(),
+    try_lift: |s| Ok(SecretPin::new(s)),
+});
 
 impl SecretPin {
     /// Wrap a freshly-generated PIN.
@@ -39,6 +51,7 @@ impl core::fmt::Debug for SecretPin {
 ///
 /// See ADR-010 for the dual-PIN OOB protocol design.
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct PairingSession {
     /// Stable request identifier,
     pub request_id: String,

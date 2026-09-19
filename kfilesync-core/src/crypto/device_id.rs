@@ -17,6 +17,7 @@ use crate::domain::DeviceId;
 /// assert_eq!(id.0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 /// ```
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn derive_device_id(cert_der: &[u8]) -> DeviceId {
     DeviceId(sha256_hex(cert_der))
 }
@@ -25,6 +26,7 @@ pub fn derive_device_id(cert_der: &[u8]) -> DeviceId {
 ///
 /// Used as a human-friendly fingerprint short form (e.g. shown in pairing UI).
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn fingerprint_short(device_id: &DeviceId) -> alloc::string::String {
     let head: &str = &device_id.0[..16];
     let mut out: String = alloc::string::String::with_capacity(19);

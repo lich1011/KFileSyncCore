@@ -1,3 +1,5 @@
+//!
+//! 
 //! A [`VersionVector`] maps device IDs to monotonically-increasing counters.
 //! Two vectors `a` and `b` relate causally in exactly one of three ways:
 //!
@@ -41,6 +43,15 @@ use serde::{Deserialize, Serialize};
 pub struct VersionVector {
     entries: BTreeMap<String, u64>,
 }
+
+// UniFFI has no native `BTreeMap` support; bridge through its builtin
+// `HashMap` wire type. Iteration order does not matter across the FFI
+// boundary since the map is rebuilt into a `BTreeMap` on lift.
+#[cfg(feature = "ffi")]
+uniffi::custom_type!(VersionVector, std::collections::HashMap<String, u64>, {
+    lower: |vv| vv.entries.into_iter().collect(),
+    try_lift: |v| Ok(VersionVector { entries: v.into_iter().collect() }),
+});
 
 impl VersionVector {
     /// Construct an empty vector - represents "no device has written yet".

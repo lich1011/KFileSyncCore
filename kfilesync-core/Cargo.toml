@@ -22,7 +22,7 @@ crate-type = ["rlib", "staticlib", "cdylib"]
 # Enable `ffi` to generate the UniFFI bindings entry point.
 default = ["std"]
 std = ["serde/std", "serde_json/std"]
-ffi = ["dep:uniffi"]
+ffi = ["dep:uniffi","std"]
 
 [dependencies]
 serde.workspace = true
@@ -38,10 +38,10 @@ parking_lot.workspace = true
 thiserror.workspace = true
 uniffi = { workspace = true, optional = true }
 
-[build-dependencies]
+#[build-dependencies]
 # Always pulled in (small, build-only), Actual scaffolding generation is
 # gated behind `#[cfg(feature = "ffi")]` inside build.rs.
-uniffi = { workspace = true, features = ["build"] }
+#uniffi = { workspace = true, features = ["build"] }
 
 [dev-dependencies]
 proptest.workspace = true

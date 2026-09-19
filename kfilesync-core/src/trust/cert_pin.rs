@@ -12,6 +12,7 @@ use subtle::ConstantTimeEq;
 /// Both inputs must be normalized (lowercase hex, no separators). The
 /// comparison is constant-time to prevent timing attacks.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn verify_fingerprint_hex(asserted: &str, expected: &str) -> bool {
     if asserted.len() != expected.len() {
         return false;

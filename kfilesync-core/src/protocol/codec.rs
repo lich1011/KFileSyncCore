@@ -11,6 +11,7 @@ use serde::Serialize;
 
 /// Failure modes when decoding a wire payload.
 #[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Error))]
 pub enum ParseError {
     /// Malformed JSON or unexpected fields.
     #[error("malformed payload: {0}")]
@@ -19,6 +20,7 @@ pub enum ParseError {
 
 /// Failure modes when encoding a wire payload.
 #[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Error))]
 pub enum EncodeError {
     /// Internal serialization failure.
     #[error("encode failure: {0}")]
@@ -34,6 +36,73 @@ pub fn parse<T: DeserializeOwned>(bytes: &[u8]) -> Result<T, ParseError> {
 pub fn encode<T: Serialize>(value: &T) -> Result<Vec<u8>, EncodeError> {
     serde_json::to_vec(value).map_err(|e| EncodeError::Internal(e.to_string()))
 }
+// UniFFI cannot export a generic function (`parse<T>`/`encode<T>` above)
+// - see ADR-018. This macro produces one non-generic wrapper pair per
+// top-level wire DTO, so hosts consuming core only through the UniFFI
+// boundary still get a single-source-of-truth codec instead of having to
+// hand-roll `kotlinx.serialization`/whatever local JSON layer.
+//
+// Only *top-level* wire bodies (the ones a route actually sends/receives
+// wholesale) get a pair - nested-only shapes like `BlockInfoDto` or
+// `TransferItemDto` are never parsed/encoded on their own, only as part of
+// their parent.
+macro_rules! ffi_codec_pair {
+    ($parse_fn:ident, $encode_fn:ident,$ty:ty) => {
+        /// Parse this DTO from JSON bytes (non-generic wrapper around
+        /// [`parse`], so UniFFI can export it).
+        #[cfg_attr(feature = "ffi", uniffi::export)]
+        pub fn $parse_fn(bytes: Vec<u8>) -> Result<$ty, ParseError> {
+            parse(&bytes)
+        }
+
+        /// Serialize this DTO to JSON bytes (non-generic wrapper around
+        /// [`encode`], so UniFFI can export it).
+        #[cfg_attr(feature = "ffi", uniffi::export)]
+        pub fn $encode_fn(value:$ty) -> Result<Vec<u8>, EncodeError> {
+            encode(&value)
+        }
+    };
+}
+
+use crate::protocol::dto::{
+    DeviceInfoDto, IndexResponseDto, PairConfirmDto, PairRequestDto, PairResultDto,
+    PairRevokedDto, ShareAuthorizedDto, ShareInviteDto, ShareLeaveDto, TransferAcceptDto,
+    TransferCancelDto, TransferChunkAckDto, TransferRequestDto,
+};
+
+ffi_codec_pair!(parse_device_info, encode_device_info, DeviceInfoDto);
+ffi_codec_pair!(parse_pair_request, encode_pair_request, PairRequestDto);
+ffi_codec_pair!(parse_pair_confirm, encode_pair_confirm, PairConfirmDto);
+ffi_codec_pair!(parse_pair_revoke, encode_pair_revoke, PairRevokedDto);
+ffi_codec_pair!(parse_pair_result, encode_pair_result, PairResultDto);
+ffi_codec_pair!(parse_share_invite, encode_share_invite, ShareInviteDto);
+ffi_codec_pair!(
+    parse_share_authorize,
+    encode_share_authorize,
+    ShareAuthorizedDto
+);
+ffi_codec_pair!(parse_share_leave, encode_share_leave, ShareLeaveDto);
+ffi_codec_pair!(parse_index_response, encode_index_response, IndexResponseDto);
+ffi_codec_pair!(
+    parse_transfer_request,
+    encode_transfer_request,
+    TransferRequestDto
+);
+ffi_codec_pair!(
+    parse_transfer_accept,
+    encode_transfer_accept,
+    TransferAcceptDto
+);
+ffi_codec_pair!(
+    parse_transfer_chunk_ack,
+    encode_transfer_chunk_ack,
+    TransferChunkAckDto
+);
+ffi_codec_pair!(
+    parse_transfer_cancel,
+    encode_transfer_cancel,
+    TransferCancelDto
+);
 
 #[cfg(test)]
 mod tests {
@@ -41,8 +110,8 @@ mod tests {
     use crate::protocol::dto::{
         BlockInfoDto, DeviceInfoDto, FileEntryDto, IndexResponseDto, PairConfirmDto,
         PairRequestDto, PairResultDto, PairRevokeDto, ShareAuthorizeDto, ShareInviteDto,
-        ShareLeaveDto, TransferAcceptDto, TransferCancelDto, TransferChunkAckDto, TransferItemDto,
-        TransferRequestDto,
+        ShareLeaveDto, SkipChunksMap, TransferAcceptDto, TransferCancelDto, TransferChunkAckDto, 
+        TransferItemDto, TransferRequestDto, VersionVectorMap,
     };
     use alloc::collections::BTreeMap;
 
@@ -171,7 +240,7 @@ mod tests {
                 size: 1024,
                 modified_at_ms: 1_717_900_000_000,
                 modified_by: "dev-a".into(),
-                version_vector: vv,
+                version_vector: VersionVectorMap(vv),
                 sha256: Some("deadbeef".into()),
                 blocks: alloc::vec![BlockInfoDto {
                     index: 0,
@@ -198,7 +267,7 @@ mod tests {
                 size: 0,
                 modified_at_ms: 1_000,
                 modified_by: "dev-a".into(),
-                version_vector: BTreeMap::new(),
+                version_vector: VersionVectorMap::default(),
                 sha256: None,
                 blocks: Vec::new(),
                 deleted: true,
@@ -235,7 +304,7 @@ mod tests {
             job_id: "job-1".into(),
             accepted: true,
             reason: None,
-            skip_chunks: skip,
+            skip_chunks: SkipChunksMap(skip),
         });
     }
 

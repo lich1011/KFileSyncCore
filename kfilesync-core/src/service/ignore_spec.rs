@@ -25,6 +25,7 @@ use crate::invariants::defaults_syncignore::{COMMON_DEFAULTS, MOBILE_DEFAULTS};
 
 /// Errors when building an [`IgnoreSpec`].
 #[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Error))]
 pub enum IgnoreSpecError {
     /// One of the rules (a default, `.syncignore` line, or user rule)
     /// failed to parse as a gitignore pattern.
@@ -33,10 +34,12 @@ pub enum IgnoreSpecError {
 }
 
 /// Compiled `.syncignore` matcher.
+#[cfg_attr(feature = "ffi", derive(uniffi::Object))]
 pub struct IgnoreSpec {
     inner: Gitignore,
 }
 
+#[cfg_attr(feature = "ffi", uniffi::export)]
 impl IgnoreSpec {
     /// Build a matcher for `share_root`, combining built-in defaults with
     /// any `.syncignore` content and additional user rules, in this
@@ -65,10 +68,11 @@ impl IgnoreSpec {
     /// built-in default would indicate a bug in this crate, not the host;
     /// a malformed `.syncignore` or user rule indicates the host should
     /// surface a validation error rather than silently drop the rule.
+    #[cfg_attr(feature = "ffi", uniffi::constructor)]
     pub fn build(
         share_root: &str,
-        syncignore_content: Option<&str>,
-        extra_user_rules: &[&str],
+        syncignore_content: Option<String>,
+        extra_user_rules: &[String],
         is_mobile: bool,
     ) -> Result<Self, IgnoreSpecError> {
         // Deliberately NOT `GitignoreBuilder::new(share_root)`: the
@@ -172,7 +176,7 @@ mod tests {
         // This is the exact semantic CROSS_VALIDATION flagged as broken in
         // mobile's hand-rolled matcher: a file with no rule of its own
         // still counts as ignored if an ancestor directory does.
-        let spec = IgnoreSpec::build("/share", None, &["build/"], false).unwrap();
+        let spec = IgnoreSpec::build("/share", None, &["build/".to_string()], false).unwrap();
         assert!(spec.is_ignored("build", true));
         assert!(spec.is_ignored("build/output.txt", false));
         assert!(spec.is_ignored("build/nested/deep/file.o", false));
@@ -182,7 +186,7 @@ mod tests {
     #[test]
     fn syncignore_content_is_parsed_like_a_real_gitignore_file() {
         let content = "# a comment, and a blank line follow\n\n*.log\ncache/\n";
-        let spec = IgnoreSpec::build("/share", Some(content), &[], false).unwrap();
+        let spec = IgnoreSpec::build("/share", Some(content.to_string()), &[], false).unwrap();
         assert!(spec.is_ignored("debug.log", false));
         assert!(spec.is_ignored("cache/entry.bin", false));
         assert!(!spec.is_ignored("keep.txt", false));
@@ -191,14 +195,14 @@ mod tests {
     #[test]
     fn extra_user_rules_apply_after_syncignore_and_can_negate_it() {
         let content = "*.log\n";
-        let spec = IgnoreSpec::build("/share", Some(content), &["!important.log"], false).unwrap();
+        let spec = IgnoreSpec::build("/share", Some(content.to_string()), &["!important.log".to_string()], false).unwrap();
         assert!(spec.is_ignored("debug.log", false));
         assert!(!spec.is_ignored("important.log", false));
     }
 
     #[test]
     fn double_star_glob_patterns_work() {
-        let spec = IgnoreSpec::build("/share", None, &["**/*.bak", "temp/**"], false).unwrap();
+        let spec = IgnoreSpec::build("/share", None, &["**/*.bak".to_string(), "temp/**".to_string()], false).unwrap();
         assert!(spec.is_ignored("a/b/c/file.bak", false));
         assert!(spec.is_ignored("temp/x/y/z.txt", false));
         assert!(!spec.is_ignored("keep.bak.txt", false));
@@ -207,13 +211,13 @@ mod tests {
     #[test]
     fn an_invalid_rule_is_reported_as_a_build_error() {
         // An invalid range like `[z-a]` fails glob compilation.
-        let result = IgnoreSpec::build("/share", None, &["[z-a]"], false);
+        let result = IgnoreSpec::build("/share", None, &["a\\".to_string()], false);
         assert!(result.is_err());
     }
 
     #[test]
     fn is_ignored_works_the_same_regardless_of_a_leading_slash_in_the_path() {
-        let spec = IgnoreSpec::build("/share", None, &[".DS_Store"], false).unwrap();
+        let spec = IgnoreSpec::build("/share", None, &[".DS_Store".to_string()], false).unwrap();
         assert!(spec.is_ignored(".DS_Store", false));
         assert!(spec.is_ignored("/.DS_Store", false));
     }

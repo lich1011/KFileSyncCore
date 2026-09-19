@@ -22,6 +22,7 @@ use crate::trust::cert_pin;
 
 /// Outcome of verifying a PIN against a session's own generated PIN.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 pub enum PinVerdict {
     /// PIN matched; pairing may proceed.
     Accepted,
@@ -33,24 +34,55 @@ pub enum PinVerdict {
     MaxAttemptsExceeded,
 }
 
+/// One HTTP header name/value pair.
+///
+/// UniFFI has no native tuple support, so `(String, String)` pairs are
+/// wrapped in this named record wherever they cross the FFI boundary.
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
+pub struct HeaderPair {
+    /// Header name.
+    pub name: String,
+    /// Header value.
+    pub value: String,
+}
+
 /// A fully-prepared outbound HTTP request: body bytes plus the headers a
 /// host must attach. Core does not perform the HTTP call itself.
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct PreparedRequest {
     /// Serialized JSON body (UTF-8 bytes).
     pub body: Vec<u8>,
     /// Headers to send with the request, including anti-replay headers.
-    pub headers: Vec<(String, String)>,
+    pub headers: Vec<HeaderPair>,
 }
 
-fn anti_replay_headers(device_id: &str, timestamp_ms: i64, nonce: &str) -> Vec<(String, String)> {
+/// Result of [`start_outbound`]: the freshly-created session plus the
+/// request the host should send.
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
+pub struct StartOutboundResult {
+    /// The newly-created pairing session (persist this).
+    pub session: PairingSession,
+    /// The `POST /pair/request` body and headers to send.
+    pub request: PreparedRequest,
+}
+
+fn anti_replay_headers(device_id: &str, timestamp_ms: i64, nonce: &str) -> Vec<HeaderPair> {
     alloc::vec![
-        (headers::HEADER_DEVICE_ID.to_string(), device_id.to_string()),
-        (
-            headers::HEADER_TIMESTAMP.to_string(),
-            timestamp_ms.to_string()
-        ),
-        (headers::HEADER_NONCE.to_string(), nonce.to_string()),
+        HeaderPair {
+            name: headers::HEADER_DEVICE_ID.to_string(),
+            value: device_id.to_string(),
+        },
+        HeaderPair {
+            name: headers::HEADER_TIMESTAMP.to_string(),
+            value: timestamp_ms.to_string(),
+        },
+        HeaderPair {
+            name: headers::HEADER_NONCE.to_string(),
+            value: nonce.to_string(),
+        },
     ]
 }
 
@@ -61,6 +93,7 @@ fn anti_replay_headers(device_id: &str, timestamp_ms: i64, nonce: &str) -> Vec<(
 /// docs) - typically a 6-digit PIN and a fresh random nonce/UUID from the
 /// host's own CSPRNG.
 #[allow(clippy::too_many_arguments)]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn start_outbound(
     request_id: &str,
     nonce: &str,
@@ -73,8 +106,8 @@ pub fn start_outbound(
     max_attempts: u32,
     now_ms: i64,
     pin_ttl_ms: i64,
-) -> Result<(PairingSession, PreparedRequest), EncodeError> {
-    let expires_at_ms: i64 = now_ms + pin_ttl_ms;
+) -> Result<StartOutboundResult, EncodeError> {
+    let expires_at_ms = now_ms + pin_ttl_ms;
 
     let session = PairingSession {
         request_id: request_id.to_string(),
@@ -96,10 +129,13 @@ pub fn start_outbound(
         expires_at_ms,
     };
 
-    let body: Vec<u8> = codec::encode(&dto)?;
-    let headers: Vec<(String, String)> = anti_replay_headers(from_device_id, now_ms, nonce);
+    let body = codec::encode(&dto)?;
+    let headers = anti_replay_headers(from_device_id, now_ms, nonce);
 
-    Ok((session, PreparedRequest { body, headers }))
+    Ok(StartOutboundResult {
+        session,
+        request: PreparedRequest { body, headers },
+    })
 }
 
 /// Responder side: an inbound `PairRequestDto` has already passed
@@ -110,6 +146,7 @@ pub fn start_outbound(
 ///
 /// `our_pin` is again host-supplied.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn receive_incoming(
     incoming: &PairRequestDto,
     our_pin: SecretPin,
@@ -136,19 +173,40 @@ pub fn record_peer_pin(session: &mut PairingSession, peer_pin_from_human: &str) 
     session.expected_their_pin = Some(SecretPin::new(peer_pin_from_human.to_string()));
 }
 
+/// Outcome of [`prepare_confirm`].
+///
+/// UniFFI cannot represent a nested `Option<Result<T, E>>` return type, so
+/// this flattens both the "not ready yet" and "encode failed" cases into
+/// one enum. The encode-failure variant carries the error's rendered
+/// message rather than the raw [`EncodeError`] - the underlying cause
+/// (JSON serialization) is not something callers act on differently.
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
+pub enum PrepareConfirmOutcome {
+    /// `record_peer_pin` has not been called yet on this session.
+    NotReady,
+    /// The request is ready to send.
+    Ready(PreparedRequest),
+    /// Serialization failed; carries the error's display message.
+    EncodeFailed(String),
+}
+
 /// Prepare the `POST /pair/confirm` body. `session.expected_their_pin`
 /// must already be set via [`record_peer_pin`] - `None` means the host
 /// asked before the human finished the OOB step, which is a caller bug,
 /// not a runtime condition to recover from silently, so this returns
-/// `None` rather than sending a confirm with an empty PIN.
+/// [`PrepareConfirmOutcome::NotReady`] rather than sending a confirm with
+/// an empty PIN.
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn prepare_confirm(
     session: &PairingSession,
     device_id: &str,
     timestamp_ms: i64,
     nonce: &str,
     certificate_pem: &str,
-) -> Option<Result<PreparedRequest, EncodeError>> {
-    let peer_pin: &SecretPin = session.expected_their_pin.as_ref()?;
+) -> PrepareConfirmOutcome {
+    let Some(peer_pin) = session.expected_their_pin.as_ref() else {
+        return PrepareConfirmOutcome::NotReady;
+    };
 
     let dto = PairConfirmDto {
         request_id: session.request_id.clone(),
@@ -156,28 +214,27 @@ pub fn prepare_confirm(
         certificate_pem: certificate_pem.to_string(),
     };
 
-    Some(codec::encode(&dto).map(|body: Vec<u8>| PreparedRequest {
-        body,
-        headers: anti_replay_headers(device_id, timestamp_ms, nonce),
-    }))
+    match codec::encode(&dto) {
+        Ok(body) => PrepareConfirmOutcome::Ready(PreparedRequest {
+            body,
+            headers: anti_replay_headers(device_id, timestamp_ms, nonce),
+        }),
+        Err(e) => PrepareConfirmOutcome::EncodeFailed(e.to_string()),
+    }
 }
 
 /// Verify a PIN against this session's own generated PIN
 /// (`session.our_pin`) - the ground truth only this device knows.
 ///
 /// `provided_pin` is whatever value needs checking: extracted from an
-/// incoming `PairConfirmDto::pin` when handling the peer's confirm
+/// incoming [`PairConfirmDto::pin`] when handling the peer's confirm
 /// request, or typed directly by a human in a purely local UI flow. Core
 /// treats both sources identically; only the *comparison* is its concern.
 ///
 /// Uses constant-time comparison via [`cert_pin::verify_fingerprint_hex`]
 /// (despite the name, it is a generic constant-time byte-equality check -
 /// reused here rather than duplicated).
-pub fn verify_peer_pin(
-    session: &mut PairingSession,
-    provided_pin: &str,
-    now_ms: i64,
-) -> PinVerdict {
+pub fn verify_peer_pin(session: &mut PairingSession, provided_pin: &str, now_ms: i64) -> PinVerdict {
     if now_ms > session.expires_at_ms {
         return PinVerdict::Expired;
     }
@@ -212,7 +269,7 @@ mod tests {
 
     #[test]
     fn start_outbound_produces_a_session_and_a_valid_request_body() {
-        let (session, req) = start_outbound(
+        let result = start_outbound(
             "req-1",
             "nonce-1",
             "dev-b",
@@ -226,6 +283,7 @@ mod tests {
             300_000,
         )
         .unwrap();
+        let (session, req) = (result.session, result.request);
 
         assert_eq!(session.request_id, "req-1");
         assert_eq!(session.target_device_id, "dev-b");
@@ -240,7 +298,7 @@ mod tests {
         assert_eq!(parsed.from_platform, "macos");
         assert_eq!(parsed.expires_at_ms, 301_000);
 
-        let header_names: Vec<&str> = req.headers.iter().map(|(k, _)| k.as_str()).collect();
+        let header_names: Vec<&str> = req.headers.iter().map(|h| h.name.as_str()).collect();
         assert!(header_names.contains(&headers::HEADER_DEVICE_ID));
         assert!(header_names.contains(&headers::HEADER_TIMESTAMP));
         assert!(header_names.contains(&headers::HEADER_NONCE));
@@ -257,14 +315,7 @@ mod tests {
             nonce: "nonce-1".to_string(),
             expires_at_ms: 301_000,
         };
-
-        let session = receive_incoming(
-            &incoming,
-            SecretPin::new("998877".to_string()),
-            3,
-            1_000,
-            300_000,
-        );
+        let session = receive_incoming(&incoming, SecretPin::new("998877".to_string()), 3, 1_000, 300_000);
 
         assert_eq!(session.request_id, "req-1");
         assert_eq!(session.target_device_id, "dev-a");
@@ -275,10 +326,7 @@ mod tests {
     #[test]
     fn correct_pin_is_accepted() {
         let mut s = session("482913", 3, 10_000);
-        assert_eq!(
-            verify_peer_pin(&mut s, "482913", 1_000),
-            PinVerdict::Accepted
-        );
+        assert_eq!(verify_peer_pin(&mut s, "482913", 1_000), PinVerdict::Accepted);
         assert_eq!(s.attempts, 1);
     }
 
@@ -292,14 +340,8 @@ mod tests {
     #[test]
     fn expired_session_is_rejected_before_touching_attempts() {
         let mut s = session("482913", 3, 10_000);
-        assert_eq!(
-            verify_peer_pin(&mut s, "482913", 10_001),
-            PinVerdict::Expired
-        );
-        assert_eq!(
-            s.attempts, 0,
-            "an expired check must not consume an attempt"
-        );
+        assert_eq!(verify_peer_pin(&mut s, "482913", 10_001), PinVerdict::Expired);
+        assert_eq!(s.attempts, 0, "an expired check must not consume an attempt");
     }
 
     #[test]
@@ -309,23 +351,25 @@ mod tests {
         assert_eq!(verify_peer_pin(&mut s, "wrong-2", 1_000), PinVerdict::Wrong);
         // Third call: attempts (2) >= max_attempts (2), locked out - even
         // though this call finally supplies the right PIN.
-        assert_eq!(
-            verify_peer_pin(&mut s, "482913", 1_000),
-            PinVerdict::MaxAttemptsExceeded
-        );
+        assert_eq!(verify_peer_pin(&mut s, "482913", 1_000), PinVerdict::MaxAttemptsExceeded);
     }
 
     #[test]
     fn record_and_prepare_confirm_round_trip() {
         let mut s = session("482913", 3, 10_000);
-        assert!(prepare_confirm(&s, "dev-a", 1_000, "n2", "CERT").is_none());
+        assert!(matches!(
+            prepare_confirm(&s, "dev-a", 1_000, "n2", "CERT"),
+            PrepareConfirmOutcome::NotReady
+        ));
 
         record_peer_pin(&mut s, "998877");
         assert_eq!(s.expected_their_pin.as_ref().unwrap().expose(), "998877");
 
-        let req = prepare_confirm(&s, "dev-a", 1_000, "n2", "-----BEGIN CERT-----")
-            .unwrap()
-            .unwrap();
+        let PrepareConfirmOutcome::Ready(req) =
+            prepare_confirm(&s, "dev-a", 1_000, "n2", "-----BEGIN CERT-----")
+        else {
+            panic!("expected Ready outcome");
+        };
 
         let parsed: PairConfirmDto = codec::parse(&req.body).unwrap();
         assert_eq!(parsed.request_id, "req-1");

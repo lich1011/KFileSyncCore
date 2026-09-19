@@ -50,6 +50,7 @@ impl Sha256State {
 
 /// One-shot helper for small inputs.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn sha256_hex(data: &[u8]) -> String {
     let mut s: Sha256State = Sha256State::new();
     s.update(data);

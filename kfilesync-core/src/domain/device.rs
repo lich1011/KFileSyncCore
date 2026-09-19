@@ -1,8 +1,9 @@
 //! Device model and trust state machine.
 //!
-//! # Sprint 3 implementation
-//!
-//! Currently a placeholder. Full implementation in Sprint 3.
+//! Struct +fields only - the state-transition *logic* (pairing ceremony,
+//! trust evalutaion) lives in `trust::pairing_state` and 
+//! `trust::turst_evaluator`, which operate on `Device`/`DeviceState` tather
+//! than defining methods on them.
 
 use alloc::string::String;
 use serde::{Deserialize, Serialize};
@@ -14,8 +15,12 @@ use serde::{Deserialize, Serialize};
 #[serde(transparent)]
 pub struct DeviceId(pub String);
 
+#[cfg(feature = "ffi")]
+uniffi::custom_newtype!(DeviceId, String);
+
 /// Coarse-grained device category.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 #[serde(rename_all = "lowercase")]
 pub enum DeviceType {
     /// Desktop / laptop running KFileSync (Tauri).
@@ -26,6 +31,7 @@ pub enum DeviceType {
 
 /// OS / platform family.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 #[serde(rename_all = "lowercase")]
 pub enum DevicePlatform {
     /// Windows desktop.
@@ -52,6 +58,7 @@ pub enum DevicePlatform {
 ///                                                          Revoked
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Enum))]
 #[serde(tag = "state", rename_all = "snake_case")]
 pub enum DeviceState {
     /// Seen on the network but not yet trusted.
@@ -66,6 +73,7 @@ pub enum DeviceState {
 
 /// A peer device with its current trust state.
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct Device {
     /// Globally unique device identifier.
     pub id: DeviceId,

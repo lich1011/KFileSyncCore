@@ -15,6 +15,7 @@ use crate::domain::FileEntry;
 
 /// The output of `generate`.
 #[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct SyncPlan {
     /// Entries to pull from remote to local.
     pub to_pull: Vec<FileEntry>,
@@ -28,6 +29,7 @@ pub struct SyncPlan {
 
 /// A pair of entries with conflicting version vectors.
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "ffi", derive(uniffi::Record))]
 pub struct SyncConflict {
     /// Share containing the conflict.
     pub share_id: String,
@@ -67,6 +69,7 @@ pub struct SyncConflict {
 /// order wins for that index - this function does not attempt to detect or
 /// report duplicate paths.
 #[must_use]
+#[cfg_attr(feature = "ffi", uniffi::export)]
 pub fn generate(local_index: &[FileEntry], remote_index: &[FileEntry]) -> SyncPlan {
     let local_by_path: BTreeMap<&str, &FileEntry> =
         local_index.iter().map(|e| (e.path.as_str(), e)).collect();

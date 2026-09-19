@@ -40,9 +40,18 @@ pub mod service;
 pub mod trust;
 
 // --- FFI (feature-gated) ---
+//
+// `uniffi::setup_scaffolding!()` must be invoked at literal crate-root scope:
+// it hardcodes `crate::UniFFITag` in its generated code, but only defines
+// `UniFFITag` in the module it is textually expanded in. Invoking it from
+// inside `mod ffi` would define `crate::ffi::UniFFITag` instead, and every
+// other generated reference to `crate::UniFFITag` would fail to resolve.
 
 #[cfg(feature = "ffi")]
-#[allow(unsafe_code)] // UniFFI scaffolding requires unsafe internally
+uniffi::setup_scaffolding!();
+
+#[cfg(feature = "ffi")]
+#[allow(unsafe_code)] // UniFFI-generated FFI glue requires unsafe internally
 mod ffi;
 
 // --- Library metadata ---
