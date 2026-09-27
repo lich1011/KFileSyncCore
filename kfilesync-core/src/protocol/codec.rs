@@ -66,20 +66,20 @@ macro_rules! ffi_codec_pair {
 
 use crate::protocol::dto::{
     DeviceInfoDto, IndexResponseDto, PairConfirmDto, PairRequestDto, PairResultDto,
-    PairRevokedDto, ShareAuthorizedDto, ShareInviteDto, ShareLeaveDto, TransferAcceptDto,
+    PairRevokeDto, ShareAuthorizeDto, ShareInviteDto, ShareLeaveDto, TransferAcceptDto,
     TransferCancelDto, TransferChunkAckDto, TransferRequestDto,
 };
 
 ffi_codec_pair!(parse_device_info, encode_device_info, DeviceInfoDto);
 ffi_codec_pair!(parse_pair_request, encode_pair_request, PairRequestDto);
 ffi_codec_pair!(parse_pair_confirm, encode_pair_confirm, PairConfirmDto);
-ffi_codec_pair!(parse_pair_revoke, encode_pair_revoke, PairRevokedDto);
+ffi_codec_pair!(parse_pair_revoke, encode_pair_revoke, PairRevokeDto);
 ffi_codec_pair!(parse_pair_result, encode_pair_result, PairResultDto);
 ffi_codec_pair!(parse_share_invite, encode_share_invite, ShareInviteDto);
 ffi_codec_pair!(
     parse_share_authorize,
     encode_share_authorize,
-    ShareAuthorizedDto
+    ShareAuthorizeDto
 );
 ffi_codec_pair!(parse_share_leave, encode_share_leave, ShareLeaveDto);
 ffi_codec_pair!(parse_index_response, encode_index_response, IndexResponseDto);
