@@ -1,0 +1,123 @@
+name: Build & Release Core Artifacts
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  test:
+    name: Verify Tests & Conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.80"
+
+      - name: Run workspace tests
+        run: cargo test --workspace
+
+      - name: Run conformance suite
+        run: cargo run -p kfilesync-conformance-runner
+
+  build-android-aar:
+    name: Build Android AAR
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.80"
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r27c
+
+      - name: Build Android Libraries and Package AAR
+        env:
+          CORE_VERSION: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash scripts/build-aar.sh release
+          cd android && ./gradlew publish
+
+      - name: Upload AAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kfilesync-core-android-aar
+          path: android/build/outputs/aar/kfilesync-core-android-release.aar
+
+  build-ios-xcframework:
+    name: Build iOS XCFramework
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.80"
+          targets: aarch64-apple-ios,aarch64-apple-ios-sim,x86_64-apple-ios
+
+      - name: Build iOS XCFramework & Swift bindings
+        run: bash scripts/build-ios.sh release
+
+      - name: Package XCFramework Zip
+        run: |
+          cd build/ios
+          zip -r KFileSyncCore.xcframework.zip KFileSyncCore.xcframework swift/
+
+      - name: Upload XCFramework Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KFileSyncCore-xcframework
+          path: build/ios/KFileSyncCore.xcframework.zip
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-android-aar, build-ios-xcframework]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Android AAR
+        uses: actions/download-artifact@v4
+        with:
+          name: kfilesync-core-android-aar
+          path: release-assets/
+
+      - name: Download iOS XCFramework
+        uses: actions/download-artifact@v4
+        with:
+          name: KFileSyncCore-xcframework
+          path: release-assets/
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-assets/kfilesync-core-android-release.aar
+            release-assets/KFileSyncCore.xcframework.zip
+          generate_release_notes: true

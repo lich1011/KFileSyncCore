@@ -774,6 +774,60 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -801,6 +855,32 @@ fun uniffi_kfilesync_core_checksum_func_core_version(
 ): Short
 fun uniffi_kfilesync_core_checksum_func_derive_device_id(
 ): Short
+fun uniffi_kfilesync_core_checksum_func_encode_device_info(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_index_response(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_pair_confirm(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_pair_request(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_pair_result(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_pair_revoke(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_share_authorize(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_share_invite(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_share_leave(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_transfer_accept(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_transfer_cancel(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_transfer_chunk_ack(
+): Short
+fun uniffi_kfilesync_core_checksum_func_encode_transfer_request(
+): Short
 fun uniffi_kfilesync_core_checksum_func_evaluate_policy(
 ): Short
 fun uniffi_kfilesync_core_checksum_func_fingerprint_short(
@@ -808,6 +888,32 @@ fun uniffi_kfilesync_core_checksum_func_fingerprint_short(
 fun uniffi_kfilesync_core_checksum_func_generate(
 ): Short
 fun uniffi_kfilesync_core_checksum_func_hash_chunk(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_device_info(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_index_response(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_pair_confirm(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_pair_request(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_pair_result(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_pair_revoke(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_share_authorize(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_share_invite(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_share_leave(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_transfer_accept(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_transfer_cancel(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_transfer_chunk_ack(
+): Short
+fun uniffi_kfilesync_core_checksum_func_parse_transfer_request(
 ): Short
 fun uniffi_kfilesync_core_checksum_func_prepare_confirm(
 ): Short
@@ -824,6 +930,8 @@ fun uniffi_kfilesync_core_checksum_func_to_hex_lower(
 fun uniffi_kfilesync_core_checksum_func_verify_chunk(
 ): Short
 fun uniffi_kfilesync_core_checksum_func_verify_fingerprint_hex(
+): Short
+fun uniffi_kfilesync_core_checksum_func_wire_constants(
 ): Short
 fun uniffi_kfilesync_core_checksum_method_ffinoncewindowstate_clear_device(
 ): Short
@@ -938,6 +1046,32 @@ fun uniffi_kfilesync_core_fn_func_core_version(uniffi_out_err: UniffiRustCallSta
 ): RustBuffer.ByValue
 fun uniffi_kfilesync_core_fn_func_derive_device_id(`certDer`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_device_info(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_index_response(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_pair_confirm(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_pair_request(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_pair_result(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_pair_revoke(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_share_authorize(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_share_invite(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_share_leave(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_transfer_accept(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_transfer_cancel(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_transfer_chunk_ack(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_encode_transfer_request(`value`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 fun uniffi_kfilesync_core_fn_func_evaluate_policy(`peer`: RustBuffer.ByValue,`share`: RustBuffer.ByValue,`memberPermission`: RustBuffer.ByValue,`direction`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_kfilesync_core_fn_func_fingerprint_short(`deviceId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -945,6 +1079,32 @@ fun uniffi_kfilesync_core_fn_func_fingerprint_short(`deviceId`: RustBuffer.ByVal
 fun uniffi_kfilesync_core_fn_func_generate(`localIndex`: RustBuffer.ByValue,`remoteIndex`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_kfilesync_core_fn_func_hash_chunk(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_device_info(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_index_response(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_pair_confirm(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_pair_request(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_pair_result(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_pair_revoke(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_share_authorize(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_share_invite(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_share_leave(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_transfer_accept(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_transfer_cancel(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_transfer_chunk_ack(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_kfilesync_core_fn_func_parse_transfer_request(`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_kfilesync_core_fn_func_prepare_confirm(`session`: RustBuffer.ByValue,`deviceId`: RustBuffer.ByValue,`timestampMs`: Long,`nonce`: RustBuffer.ByValue,`certificatePem`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -962,6 +1122,8 @@ fun uniffi_kfilesync_core_fn_func_verify_chunk(`data`: RustBuffer.ByValue,`expec
 ): Byte
 fun uniffi_kfilesync_core_fn_func_verify_fingerprint_hex(`asserted`: RustBuffer.ByValue,`expected`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
+fun uniffi_kfilesync_core_fn_func_wire_constants(uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 fun ffi_kfilesync_core_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun ffi_kfilesync_core_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -1106,6 +1268,45 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_kfilesync_core_checksum_func_derive_device_id() != 2395.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_device_info() != 56607.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_index_response() != 52072.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_pair_confirm() != 43039.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_pair_request() != 15338.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_pair_result() != 6648.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_pair_revoke() != 59762.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_share_authorize() != 35633.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_share_invite() != 61347.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_share_leave() != 36134.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_transfer_accept() != 45046.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_transfer_cancel() != 51042.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_transfer_chunk_ack() != 41523.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_encode_transfer_request() != 27818.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_kfilesync_core_checksum_func_evaluate_policy() != 22109.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1116,6 +1317,45 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_kfilesync_core_checksum_func_hash_chunk() != 45755.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_device_info() != 42240.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_index_response() != 50867.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_pair_confirm() != 8908.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_pair_request() != 3776.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_pair_result() != 33432.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_pair_revoke() != 40854.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_share_authorize() != 59251.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_share_invite() != 13782.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_share_leave() != 16153.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_transfer_accept() != 2373.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_transfer_cancel() != 3830.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_transfer_chunk_ack() != 30416.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_parse_transfer_request() != 47542.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_kfilesync_core_checksum_func_prepare_confirm() != 10063.toShort()) {
@@ -1140,6 +1380,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_kfilesync_core_checksum_func_verify_fingerprint_hex() != 11915.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_kfilesync_core_checksum_func_wire_constants() != 3085.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_kfilesync_core_checksum_method_ffinoncewindowstate_clear_device() != 43613.toShort()) {
@@ -2523,6 +2766,44 @@ public object FfiConverterTypeBlockInfoDto: FfiConverterRustBuffer<BlockInfoDto>
             FfiConverterUInt.write(value.`index`, buf)
             FfiConverterUInt.write(value.`size`, buf)
             FfiConverterString.write(value.`hash`, buf)
+    }
+}
+
+
+
+/**
+ * Resume cursor for one [`TransferItem`]: how many of its chunks have
+ * already been exchanged and verified. `None` on the item means the item
+ * has not started; `Some` records a point a paused/interrupted transfer
+ * can resume from instead of re-sending completed chunks.
+ */
+data class Checkpoint (
+    /**
+     * Number of leading chunks (by index into `chunk_hashes`) already
+     * completed and verified.
+     */
+    var `chunksDone`: kotlin.UInt
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeCheckpoint: FfiConverterRustBuffer<Checkpoint> {
+    override fun read(buf: ByteBuffer): Checkpoint {
+        return Checkpoint(
+            FfiConverterUInt.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: Checkpoint) = (
+            FfiConverterUInt.allocationSize(value.`chunksDone`)
+    )
+
+    override fun write(value: Checkpoint, buf: ByteBuffer) {
+            FfiConverterUInt.write(value.`chunksDone`, buf)
     }
 }
 
@@ -4072,7 +4353,11 @@ data class TransferItem (
     /**
      * Per-chunk BLAKE3 hex list.
      */
-    var `chunkHashes`: List<kotlin.String>
+    var `chunkHashes`: List<kotlin.String>, 
+    /**
+     * Resume cursor. `None` until the first chunk completes.
+     */
+    var `checkpoint`: Checkpoint?
 ) {
     
     companion object
@@ -4090,6 +4375,7 @@ public object FfiConverterTypeTransferItem: FfiConverterRustBuffer<TransferItem>
             FfiConverterString.read(buf),
             FfiConverterUInt.read(buf),
             FfiConverterSequenceString.read(buf),
+            FfiConverterOptionalTypeCheckpoint.read(buf),
         )
     }
 
@@ -4099,7 +4385,8 @@ public object FfiConverterTypeTransferItem: FfiConverterRustBuffer<TransferItem>
             FfiConverterULong.allocationSize(value.`size`) +
             FfiConverterString.allocationSize(value.`sha256`) +
             FfiConverterUInt.allocationSize(value.`chunkSize`) +
-            FfiConverterSequenceString.allocationSize(value.`chunkHashes`)
+            FfiConverterSequenceString.allocationSize(value.`chunkHashes`) +
+            FfiConverterOptionalTypeCheckpoint.allocationSize(value.`checkpoint`)
     )
 
     override fun write(value: TransferItem, buf: ByteBuffer) {
@@ -4109,6 +4396,7 @@ public object FfiConverterTypeTransferItem: FfiConverterRustBuffer<TransferItem>
             FfiConverterString.write(value.`sha256`, buf)
             FfiConverterUInt.write(value.`chunkSize`, buf)
             FfiConverterSequenceString.write(value.`chunkHashes`, buf)
+            FfiConverterOptionalTypeCheckpoint.write(value.`checkpoint`, buf)
     }
 }
 
@@ -4202,6 +4490,10 @@ data class TransferJob (
      */
     var `fromDeviceId`: kotlin.String, 
     /**
+     * Whether the local host is sending or receiving this job.
+     */
+    var `direction`: TransferDirection, 
+    /**
      * State.
      */
     var `state`: TransferState, 
@@ -4223,6 +4515,7 @@ public object FfiConverterTypeTransferJob: FfiConverterRustBuffer<TransferJob> {
             FfiConverterString.read(buf),
             FfiConverterString.read(buf),
             FfiConverterString.read(buf),
+            FfiConverterTypeTransferDirection.read(buf),
             FfiConverterTypeTransferState.read(buf),
             FfiConverterSequenceTypeTransferItem.read(buf),
         )
@@ -4232,6 +4525,7 @@ public object FfiConverterTypeTransferJob: FfiConverterRustBuffer<TransferJob> {
             FfiConverterString.allocationSize(value.`id`) +
             FfiConverterString.allocationSize(value.`sessionId`) +
             FfiConverterString.allocationSize(value.`fromDeviceId`) +
+            FfiConverterTypeTransferDirection.allocationSize(value.`direction`) +
             FfiConverterTypeTransferState.allocationSize(value.`state`) +
             FfiConverterSequenceTypeTransferItem.allocationSize(value.`items`)
     )
@@ -4240,6 +4534,7 @@ public object FfiConverterTypeTransferJob: FfiConverterRustBuffer<TransferJob> {
             FfiConverterString.write(value.`id`, buf)
             FfiConverterString.write(value.`sessionId`, buf)
             FfiConverterString.write(value.`fromDeviceId`, buf)
+            FfiConverterTypeTransferDirection.write(value.`direction`, buf)
             FfiConverterTypeTransferState.write(value.`state`, buf)
             FfiConverterSequenceTypeTransferItem.write(value.`items`, buf)
     }
@@ -4311,6 +4606,184 @@ public object FfiConverterTypeTransferRequestDto: FfiConverterRustBuffer<Transfe
             FfiConverterString.write(value.`fromAlias`, buf)
             FfiConverterOptionalString.write(value.`shareId`, buf)
             FfiConverterSequenceTypeTransferItemDto.write(value.`files`, buf)
+    }
+}
+
+
+
+/**
+ * Bundled route paths and header names, for hosts that consume core only
+ * over the UniFFI boundary and therefore cannot see this crate's plain
+ * `pub const &str` items - UniFFI does not export bare constants (see
+ * ADR-018). Rust/native consumers should keep using [`routes`] and
+ * [`headers`] directly; this exists purely as an FFI bridge.
+ */
+data class WireConstants (
+    /**
+     * [`routes::API_PREFIX`]
+     */
+    var `apiPrefix`: kotlin.String, 
+    /**
+     * [`routes::INFO`]
+     */
+    var `routeInfo`: kotlin.String, 
+    /**
+     * [`routes::HEALTHZ`]
+     */
+    var `routeHealthz`: kotlin.String, 
+    /**
+     * [`routes::REGISTER`]
+     */
+    var `routeRegister`: kotlin.String, 
+    /**
+     * [`routes::PAIR_REQUEST`]
+     */
+    var `routePairRequest`: kotlin.String, 
+    /**
+     * [`routes::PAIR_CONFIRM`]
+     */
+    var `routePairConfirm`: kotlin.String, 
+    /**
+     * [`routes::PAIR_REVOKE`]
+     */
+    var `routePairRevoke`: kotlin.String, 
+    /**
+     * [`routes::SHARE_INVITE`]
+     */
+    var `routeShareInvite`: kotlin.String, 
+    /**
+     * [`routes::SHARE_AUTHORIZE`]
+     */
+    var `routeShareAuthorize`: kotlin.String, 
+    /**
+     * [`routes::SHARE_LEAVE`]
+     */
+    var `routeShareLeave`: kotlin.String, 
+    /**
+     * [`routes::SYNC_INDEX`]
+     */
+    var `routeSyncIndex`: kotlin.String, 
+    /**
+     * [`routes::TRANSFER_REQUEST`]
+     */
+    var `routeTransferRequest`: kotlin.String, 
+    /**
+     * [`routes::TRANSFER_CHUNK_PREFIX`]
+     */
+    var `routeTransferChunkPrefix`: kotlin.String, 
+    /**
+     * [`routes::TRANSFER_CANCEL`]
+     */
+    var `routeTransferCancel`: kotlin.String, 
+    /**
+     * [`routes::DEFAULT_PORT`]
+     */
+    var `defaultPort`: kotlin.UShort, 
+    /**
+     * [`headers::HEADER_DEVICE_ID`]
+     */
+    var `headerDeviceId`: kotlin.String, 
+    /**
+     * [`headers::HEADER_TIMESTAMP`]
+     */
+    var `headerTimestamp`: kotlin.String, 
+    /**
+     * [`headers::HEADER_NONCE`]
+     */
+    var `headerNonce`: kotlin.String, 
+    /**
+     * [`headers::HEADER_FINGERPRINT`]
+     */
+    var `headerFingerprint`: kotlin.String, 
+    /**
+     * [`headers::HEADER_CHUNK_HASH`]
+     */
+    var `headerChunkHash`: kotlin.String, 
+    /**
+     * [`headers::TIMESTAMP_UNIT_IS_MILLIS`]
+     */
+    var `timestampUnitIsMillis`: kotlin.Boolean
+) {
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeWireConstants: FfiConverterRustBuffer<WireConstants> {
+    override fun read(buf: ByteBuffer): WireConstants {
+        return WireConstants(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterUShort.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: WireConstants) = (
+            FfiConverterString.allocationSize(value.`apiPrefix`) +
+            FfiConverterString.allocationSize(value.`routeInfo`) +
+            FfiConverterString.allocationSize(value.`routeHealthz`) +
+            FfiConverterString.allocationSize(value.`routeRegister`) +
+            FfiConverterString.allocationSize(value.`routePairRequest`) +
+            FfiConverterString.allocationSize(value.`routePairConfirm`) +
+            FfiConverterString.allocationSize(value.`routePairRevoke`) +
+            FfiConverterString.allocationSize(value.`routeShareInvite`) +
+            FfiConverterString.allocationSize(value.`routeShareAuthorize`) +
+            FfiConverterString.allocationSize(value.`routeShareLeave`) +
+            FfiConverterString.allocationSize(value.`routeSyncIndex`) +
+            FfiConverterString.allocationSize(value.`routeTransferRequest`) +
+            FfiConverterString.allocationSize(value.`routeTransferChunkPrefix`) +
+            FfiConverterString.allocationSize(value.`routeTransferCancel`) +
+            FfiConverterUShort.allocationSize(value.`defaultPort`) +
+            FfiConverterString.allocationSize(value.`headerDeviceId`) +
+            FfiConverterString.allocationSize(value.`headerTimestamp`) +
+            FfiConverterString.allocationSize(value.`headerNonce`) +
+            FfiConverterString.allocationSize(value.`headerFingerprint`) +
+            FfiConverterString.allocationSize(value.`headerChunkHash`) +
+            FfiConverterBoolean.allocationSize(value.`timestampUnitIsMillis`)
+    )
+
+    override fun write(value: WireConstants, buf: ByteBuffer) {
+            FfiConverterString.write(value.`apiPrefix`, buf)
+            FfiConverterString.write(value.`routeInfo`, buf)
+            FfiConverterString.write(value.`routeHealthz`, buf)
+            FfiConverterString.write(value.`routeRegister`, buf)
+            FfiConverterString.write(value.`routePairRequest`, buf)
+            FfiConverterString.write(value.`routePairConfirm`, buf)
+            FfiConverterString.write(value.`routePairRevoke`, buf)
+            FfiConverterString.write(value.`routeShareInvite`, buf)
+            FfiConverterString.write(value.`routeShareAuthorize`, buf)
+            FfiConverterString.write(value.`routeShareLeave`, buf)
+            FfiConverterString.write(value.`routeSyncIndex`, buf)
+            FfiConverterString.write(value.`routeTransferRequest`, buf)
+            FfiConverterString.write(value.`routeTransferChunkPrefix`, buf)
+            FfiConverterString.write(value.`routeTransferCancel`, buf)
+            FfiConverterUShort.write(value.`defaultPort`, buf)
+            FfiConverterString.write(value.`headerDeviceId`, buf)
+            FfiConverterString.write(value.`headerTimestamp`, buf)
+            FfiConverterString.write(value.`headerNonce`, buf)
+            FfiConverterString.write(value.`headerFingerprint`, buf)
+            FfiConverterString.write(value.`headerChunkHash`, buf)
+            FfiConverterBoolean.write(value.`timestampUnitIsMillis`, buf)
     }
 }
 
@@ -5358,19 +5831,74 @@ public object FfiConverterTypeSyncMode: FfiConverterRustBuffer<SyncMode> {
 
 
 /**
+ * Which side of a [`TransferJob`] the local host is on.
+ *
+ * `TransferJob::from_device_id` alone cannot answer "am I sending or
+ * receiving" without every caller separately comparing it against "my own
+ * device id" - this field makes that comparison once, at job-creation
+ * time, instead of at every consumption site.
+ */
+
+enum class TransferDirection {
+    
+    /**
+     * Local device is `from_device_id`; we are sending.
+     */
+    OUTGOING,
+    /**
+     * Local device is the peer; we are receiving.
+     */
+    INCOMING;
+    companion object
+}
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeTransferDirection: FfiConverterRustBuffer<TransferDirection> {
+    override fun read(buf: ByteBuffer) = try {
+        TransferDirection.values()[buf.getInt() - 1]
+    } catch (e: IndexOutOfBoundsException) {
+        throw RuntimeException("invalid enum value, something is very wrong!!", e)
+    }
+
+    override fun allocationSize(value: TransferDirection) = 4UL
+
+    override fun write(value: TransferDirection, buf: ByteBuffer) {
+        buf.putInt(value.ordinal + 1)
+    }
+}
+
+
+
+
+
+/**
  * State machine for a transfer job.
  */
 
 enum class TransferState {
     
     /**
-     * Job created, awaiting peer acceptance.
+     * Job created locally, not yet handed to the peer (queued, e.g. while
+     * offline or waiting for a network path).
+     */
+    PENDING,
+    /**
+     * Request handshake sent to the peer, awaiting acceptance.
      */
     REQUESTED,
     /**
      * Peer accepted, chunks being exchanged.
      */
     ACTIVE,
+    /**
+     * Interrupted (user-paused, or connection/process loss). Each item's
+     * `TransferItem::checkpoint` records how far it got, so resuming
+     * re-enters `Active` without re-transferring completed chunks.
+     */
+    PAUSED,
     /**
      * All chunks done, verifying integrity.
      */
@@ -5470,6 +5998,38 @@ public object FfiConverterOptionalString: FfiConverterRustBuffer<kotlin.String?>
         } else {
             buf.put(1)
             FfiConverterString.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalTypeCheckpoint: FfiConverterRustBuffer<Checkpoint?> {
+    override fun read(buf: ByteBuffer): Checkpoint? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterTypeCheckpoint.read(buf)
+    }
+
+    override fun allocationSize(value: Checkpoint?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterTypeCheckpoint.allocationSize(value)
+        }
+    }
+
+    override fun write(value: Checkpoint?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterTypeCheckpoint.write(value, buf)
         }
     }
 }
@@ -6181,6 +6741,188 @@ public typealias FfiConverterTypeVersionVectorMap = FfiConverterMapStringULong
     
 
         /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeDeviceInfo`(`value`: DeviceInfoDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_device_info(
+        FfiConverterTypeDeviceInfoDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeIndexResponse`(`value`: IndexResponseDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_index_response(
+        FfiConverterTypeIndexResponseDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodePairConfirm`(`value`: PairConfirmDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_pair_confirm(
+        FfiConverterTypePairConfirmDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodePairRequest`(`value`: PairRequestDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_pair_request(
+        FfiConverterTypePairRequestDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodePairResult`(`value`: PairResultDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_pair_result(
+        FfiConverterTypePairResultDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodePairRevoke`(`value`: PairRevokeDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_pair_revoke(
+        FfiConverterTypePairRevokeDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeShareAuthorize`(`value`: ShareAuthorizeDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_share_authorize(
+        FfiConverterTypeShareAuthorizeDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeShareInvite`(`value`: ShareInviteDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_share_invite(
+        FfiConverterTypeShareInviteDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeShareLeave`(`value`: ShareLeaveDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_share_leave(
+        FfiConverterTypeShareLeaveDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeTransferAccept`(`value`: TransferAcceptDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_transfer_accept(
+        FfiConverterTypeTransferAcceptDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeTransferCancel`(`value`: TransferCancelDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_transfer_cancel(
+        FfiConverterTypeTransferCancelDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeTransferChunkAck`(`value`: TransferChunkAckDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_transfer_chunk_ack(
+        FfiConverterTypeTransferChunkAckDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Serialize this DTO to JSON bytes (non-generic wrapper around
+         * [`encode`], so UniFFI can export it).
+         */
+    @Throws(EncodeException::class) fun `encodeTransferRequest`(`value`: TransferRequestDto): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(EncodeException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_encode_transfer_request(
+        FfiConverterTypeTransferRequestDto.lower(`value`),_status)
+}
+    )
+    }
+    
+
+        /**
          * Decide whether `peer` may perform `direction` on `share`.
          *
          * Checks run in a fixed order, each with its own decision so the caller
@@ -6276,6 +7018,188 @@ public typealias FfiConverterTypeVersionVectorMap = FfiConverterMapStringULong
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_hash_chunk(
         FfiConverterByteArray.lower(`data`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseDeviceInfo`(`bytes`: kotlin.ByteArray): DeviceInfoDto {
+            return FfiConverterTypeDeviceInfoDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_device_info(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseIndexResponse`(`bytes`: kotlin.ByteArray): IndexResponseDto {
+            return FfiConverterTypeIndexResponseDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_index_response(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parsePairConfirm`(`bytes`: kotlin.ByteArray): PairConfirmDto {
+            return FfiConverterTypePairConfirmDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_pair_confirm(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parsePairRequest`(`bytes`: kotlin.ByteArray): PairRequestDto {
+            return FfiConverterTypePairRequestDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_pair_request(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parsePairResult`(`bytes`: kotlin.ByteArray): PairResultDto {
+            return FfiConverterTypePairResultDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_pair_result(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parsePairRevoke`(`bytes`: kotlin.ByteArray): PairRevokeDto {
+            return FfiConverterTypePairRevokeDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_pair_revoke(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseShareAuthorize`(`bytes`: kotlin.ByteArray): ShareAuthorizeDto {
+            return FfiConverterTypeShareAuthorizeDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_share_authorize(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseShareInvite`(`bytes`: kotlin.ByteArray): ShareInviteDto {
+            return FfiConverterTypeShareInviteDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_share_invite(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseShareLeave`(`bytes`: kotlin.ByteArray): ShareLeaveDto {
+            return FfiConverterTypeShareLeaveDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_share_leave(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseTransferAccept`(`bytes`: kotlin.ByteArray): TransferAcceptDto {
+            return FfiConverterTypeTransferAcceptDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_transfer_accept(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseTransferCancel`(`bytes`: kotlin.ByteArray): TransferCancelDto {
+            return FfiConverterTypeTransferCancelDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_transfer_cancel(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseTransferChunkAck`(`bytes`: kotlin.ByteArray): TransferChunkAckDto {
+            return FfiConverterTypeTransferChunkAckDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_transfer_chunk_ack(
+        FfiConverterByteArray.lower(`bytes`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Parse this DTO from JSON bytes (non-generic wrapper around
+         * [`parse`], so UniFFI can export it).
+         */
+    @Throws(ParseException::class) fun `parseTransferRequest`(`bytes`: kotlin.ByteArray): TransferRequestDto {
+            return FfiConverterTypeTransferRequestDto.lift(
+    uniffiRustCallWithError(ParseException) { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_parse_transfer_request(
+        FfiConverterByteArray.lower(`bytes`),_status)
 }
     )
     }
@@ -6395,6 +7319,20 @@ public typealias FfiConverterTypeVersionVectorMap = FfiConverterMapStringULong
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_verify_fingerprint_hex(
         FfiConverterString.lower(`asserted`),FfiConverterString.lower(`expected`),_status)
+}
+    )
+    }
+    
+
+        /**
+         * Return the single-source-of-truth route/header constants as a UniFFI
+         * `Record`. Equivalent to reading [`routes`] and [`headers`] directly
+         * only exists so FFI hosts get the same guarantee native Rust callers do.
+         */ fun `wireConstants`(): WireConstants {
+            return FfiConverterTypeWireConstants.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_kfilesync_core_fn_func_wire_constants(
+        _status)
 }
     )
     }

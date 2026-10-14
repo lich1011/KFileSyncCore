@@ -1,2 +1,9 @@
 /target
 /docs
+.DS_Store
+
+# Android packaging artifacts
+/android/.gradle
+/android/.kotlin
+/android/build
+/android/local.properties
